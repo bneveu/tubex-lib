@@ -10,7 +10,7 @@
 
 #include <time.h>
 #include "tubex_DataLoaderRedermor.h"
-#include "tubex_Function.h"
+#include "tubex_TFunction.h"
 #include "tubex_Exception.h"
 #include "tubex_Tube.h"
 
@@ -25,9 +25,9 @@ namespace tubex
 
   }
 
-  void DataLoaderRedermor::load_data(TubeVector *&x, TrajectoryVector *&truth, float timestep, const Interval& domain)
+  void DataLoaderRedermor::load_data(TubeVector *&x, TrajectoryVector *&truth, float timestep, const Interval& tdomain)
   {
-    assert(domain == Interval::ALL_REALS | DynamicalItem::valid_domain(domain));
+    assert(tdomain == Interval::ALL_REALS || DynamicalItem::valid_tdomain(tdomain));
     clock_t t_start = clock();
     cout << "Loading data... " << flush;
 
@@ -85,20 +85,20 @@ namespace tubex
       x->resize(6);
 
       // Computing robot's velocities:
-      tubex::Function f("phi", "theta", "psi", "vxr", "vyr", "vzr", 
-                        "(vxr * cos(theta) * cos(psi) \
-                          - vyr * (cos(phi) * sin(psi) - sin(theta) * cos(psi) * sin(phi)) \
-                          + vzr * (sin(phi) * sin(psi) + sin(theta) * cos(psi) * cos(phi)) \
-                          ; \
-                          vxr * cos(theta) * sin(psi) \
-                          + vyr * (cos(psi) * cos(phi) + sin(theta) * sin(psi) * sin(phi)) \
-                          - vzr * (cos(psi) * sin(phi) - sin(theta) * cos(phi) * sin(psi)) ; \
-                          - vxr * sin(theta) + vyr * cos(theta)*sin(phi) + vzr * cos(theta) * cos(phi))");
+      TFunction f("phi", "theta", "psi", "vxr", "vyr", "vzr", 
+       "(vxr * cos(theta) * cos(psi) \
+         - vyr * (cos(phi) * sin(psi) - sin(theta) * cos(psi) * sin(phi)) \
+         + vzr * (sin(phi) * sin(psi) + sin(theta) * cos(psi) * cos(phi)) \
+         ; \
+         vxr * cos(theta) * sin(psi) \
+         + vyr * (cos(psi) * cos(phi) + sin(theta) * sin(psi) * sin(phi)) \
+         - vzr * (cos(psi) * sin(phi) - sin(theta) * cos(phi) * sin(psi)) ; \
+         - vxr * sin(theta) + vyr * cos(theta)*sin(phi) + vzr * cos(theta) * cos(phi))");
       TubeVector velocities = f.eval_vector(*x);
 
       // Horizontal position
-      (*x)[0] = velocities[0].primitive(traj_data_x[8](traj_data_x.domain().lb())); // datafile: robot starts at (0.06,0.)
-      (*x)[1] = velocities[1].primitive(traj_data_x[9](traj_data_x.domain().lb()));
+      (*x)[0] = velocities[0].primitive(traj_data_x[8](traj_data_x.tdomain().lb())); // datafile: robot starts at (0.06,0.)
+      (*x)[1] = velocities[1].primitive(traj_data_x[9](traj_data_x.tdomain().lb()));
 
       // Case of the depth, directly sensed:
       (*x)[2].set_empty();
@@ -147,7 +147,7 @@ namespace tubex
 
     // Inflations
     for(map<int,vector<IntervalVector> >::iterator it = m_obs.begin(); it != m_obs.end(); it++)
-      for(int i = 0 ; i < it->second.size() ; i++)
+      for(size_t i = 0 ; i < it->second.size() ; i++)
         it->second[i][1].inflate(8.);
 
     return m_obs;

@@ -10,7 +10,8 @@
 
 #include "ibex_Interval.h"
 #include "ibex_IntervalVector.h"
-#include "tubex_Polygon.h"
+#include "tubex_Tools.h"
+#include "tubex_ConvexPolygon.h"
 #include "tubex_VIBesFigTube.h"
 
 using namespace std;
@@ -103,7 +104,7 @@ namespace tubex
     assert(tubevector != NULL);
     assert(start_index <= end_index && start_index >= 0 && end_index < tubevector->size());
     for(int i = start_index ; i <= end_index ; i++)
-      add_tube(&(*tubevector)[i], Figure::add_suffix(name, i+1), color_frgrnd, color_bckgrnd);
+      add_tube(&(*tubevector)[i], Tools::add_int(name, i+1), color_frgrnd, color_bckgrnd);
   }
 
   void VIBesFigTube::set_tube_name(const Tube *tube, const string& name)
@@ -135,7 +136,7 @@ namespace tubex
     create_groups_color(tube);
   }
 
-  void VIBesFigTube::set_tube_color(const Tube *tube, int color_type, const string& color)
+  void VIBesFigTube::set_tube_color(const Tube *tube, TubeColorType color_type, const string& color)
   {
     assert(tube != NULL);
     assert(m_map_tubes.find(tube) != m_map_tubes.end()
@@ -187,7 +188,7 @@ namespace tubex
     assert(trajvector != NULL);
     assert(start_index <= end_index && start_index >= 0 && end_index < trajvector->size());
     for(int i = start_index ; i <= end_index ; i++)
-      add_trajectory(&(*trajvector)[i], Figure::add_suffix(name, i+1), color);
+      add_trajectory(&(*trajvector)[i], Tools::add_int(name, i+1), color);
   }
 
   void VIBesFigTube::set_trajectory_name(const Trajectory *traj, const string& name)
@@ -230,7 +231,7 @@ namespace tubex
     m_map_trajs.erase(traj);
   }
 
-  void VIBesFigTube::create_group_color(const Tube *tube, int color_type)
+  void VIBesFigTube::create_group_color(const Tube *tube, TubeColorType color_type)
   {
     assert(tube != NULL);
     assert(m_map_tubes.find(tube) != m_map_tubes.end()
@@ -314,7 +315,7 @@ namespace tubex
         }
       }
 
-      viewbox[0] = tube->domain();
+      viewbox[0] = tube->tdomain();
       viewbox[1] = Interval(image_lb, image_ub);
 
     // Displaying tube
@@ -373,7 +374,7 @@ namespace tubex
           if(m_map_tubes[tube].tube_derivative != NULL)
             deriv_slice = m_map_tubes[tube].tube_derivative->first_slice();
 
-          draw_gate(slice->input_gate(), tube->domain().lb(), params_foreground_gates);
+          draw_gate(slice->input_gate(), tube->tdomain().lb(), params_foreground_gates);
 
           while(slice != NULL)
           {
@@ -382,7 +383,7 @@ namespace tubex
             else
               draw_slice(*slice, params_foreground_slices);
 
-            draw_gate(slice->output_gate(), slice->domain().ub(), params_foreground_gates);
+            draw_gate(slice->output_gate(), slice->tdomain().ub(), params_foreground_gates);
             slice = slice->next_slice();
             
             if(deriv_slice != NULL)
@@ -413,7 +414,7 @@ namespace tubex
 
   void VIBesFigTube::draw_slice(const Slice& slice, const Slice& deriv_slice, const vibes::Params& params_slice, const vibes::Params& params_polygon)
   {
-    assert(slice.domain() == deriv_slice.domain());
+    assert(slice.tdomain() == deriv_slice.tdomain());
 
     if(slice.codomain().is_empty())
       return; // no display
@@ -456,7 +457,7 @@ namespace tubex
     vibes::clearGroup(name(), group_name);
     vibes::newGroup(group_name, m_map_trajs[traj].color, vibesParams("figure", name()));
 
-    if(traj->domain().is_unbounded() || traj->domain().is_empty())
+    if(traj->tdomain().is_unbounded() || traj->tdomain().is_empty())
       return viewbox;
 
     // Two display modes available:
@@ -465,7 +466,7 @@ namespace tubex
 
     vector<double> v_x, v_y;
 
-    if(traj->function() == NULL)
+    if(traj->definition_type() == TrajDefnType::MAP_OF_VALUES)
     {
       typename map<double,double>::const_iterator it_scalar_values;
       for(it_scalar_values = traj->sampled_map().begin(); it_scalar_values != traj->sampled_map().end(); it_scalar_values++)
@@ -486,7 +487,7 @@ namespace tubex
 
     else
     {
-      for(double t = traj->domain().lb() ; t <= traj->domain().ub() ; t+=traj->domain().diam()/TRAJ_NB_DISPLAYED_POINTS)
+      for(double t = traj->tdomain().lb() ; t <= traj->tdomain().ub() ; t+=traj->tdomain().diam()/TRAJ_NB_DISPLAYED_POINTS)
       {
         if(m_map_trajs[traj].points_size != 0.)
           draw_point(Point(t, (*traj)(t)), m_map_trajs[traj].points_size, vibesParams("figure", name(), "group", group_name));

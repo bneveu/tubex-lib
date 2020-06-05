@@ -14,13 +14,15 @@
 
 #include <map>
 #include "tubex_DynamicalItem.h"
-#include "tubex_Function.h"
+#include "tubex_TFunction.h"
 #include "tubex_traj_arithmetic.h"
 
 namespace tubex
 {
-  class Function;
+  class TFunction;
   class TrajectoryVector;
+
+  enum class TrajDefnType { ANALYTIC_FNC, MAP_OF_VALUES };
   
   /**
    * \class Trajectory
@@ -36,27 +38,29 @@ namespace tubex
       /// @{
 
       /**
-       * \brief Creates an undefined scalar trajectory \f$x(\cdot)\f$
+       * \brief Creates an empty scalar trajectory \f$x(\cdot)\f$
+       *
+       * The trajectory is made of an empty map of values.
        */
       Trajectory();
 
       /**
        * \brief Creates a scalar trajectory \f$x(\cdot)\f$ from an analytic expression
        *
-       * \param domain Interval domain \f$[t_0,t_f]\f$
-       * \param f tubex::Function object defining the trajectory: \f$x(t)=f(t)\f$
+       * \param tdomain temporal domain \f$[t_0,t_f]\f$
+       * \param f TFunction object defining the trajectory: \f$x(t)=f(t)\f$
        */
-      Trajectory(const ibex::Interval& domain, const tubex::Function& f);
+      Trajectory(const ibex::Interval& tdomain, const TFunction& f);
 
       /**
        * \brief Creates a scalar trajectory \f$x(\cdot)\f$ from an analytic expression,
        *        and transforms it as a map of values (sampling procedure)
        *
-       * \param domain Interval domain \f$[t_0,t_f]\f$
-       * \param f tubex::Function object defining the trajectory: \f$x(t)=f(t)\f$
+       * \param tdomain temporal domain \f$[t_0,t_f]\f$
+       * \param f TFunction object defining the trajectory: \f$x(t)=f(t)\f$
        * \param timestep sampling value \f$\delta\f$ for the temporal discretization (double)
        */
-      Trajectory(const ibex::Interval& domain, const tubex::Function& f, double timestep);
+      Trajectory(const ibex::Interval& tdomain, const TFunction& f, double timestep);
 
       /**
        * \brief Creates a scalar trajectory \f$x(\cdot)\f$ from a map of values
@@ -97,7 +101,14 @@ namespace tubex
        *
        * \return an Interval object \f$[t_0,t_f]\f$
        */
-      const ibex::Interval domain() const;
+      const ibex::Interval tdomain() const;
+
+      /**
+       * \brief Returns the definition type of this trajectory
+       *
+       * \return TrajDefnType::ANALYTIC_FNC or TrajDefnType::MAP_OF_VALUES
+       */
+      TrajDefnType definition_type() const;
 
       /// @}
       /// \name Accessing values
@@ -111,11 +122,11 @@ namespace tubex
       const std::map<double,double>& sampled_map() const;
 
       /**
-       * \brief Returns the temporal function, if the object is a analytic trajectory
+       * \brief Returns the temporal function, if the object is an analytic trajectory
        *
-       * \return a pointer to a tubex::Function object
+       * \return a pointer to a TFunction object
        */
-      const tubex::Function* function() const;
+      const TFunction* tfunction() const;
 
       /**
        * \brief Returns the interval of feasible values
@@ -128,11 +139,11 @@ namespace tubex
        * \brief Returns the evaluation of this trajectory at \f$t\f$
        *
        * \note Be careful, if the trajectory is defined from an analytic function,
-       *       then an approximation will be made (since the tubex::Function returns
+       *       then an approximation will be made (since the TFunction returns
        *       a boxed evaluation, while the expected returned value is a real here).
        *       Please use the operator(Interval(double)) for a reliable evaluation.
        *
-       * \param t the temporal key (double, must belong to the trajectory domain)
+       * \param t the temporal key (double, must belong to the trajectory's tdomain)
        * \return real value \f$x(t)\f$
        */
       double operator()(double t) const;
@@ -140,7 +151,7 @@ namespace tubex
       /**
        * \brief Returns the interval evaluation of this trajectory over \f$[t]\f$
        *
-       * \param t the subdomain (Interval, must be a subset of the trajectory domain)
+       * \param t the subtdomain (Interval, must be a subset of the trajectory's domain)
        * \return Interval envelope \f$x([t])\f$
        */
       const ibex::Interval operator()(const ibex::Interval& t) const;
@@ -167,7 +178,7 @@ namespace tubex
        * \brief Tests whether this trajectory is defined or not
        *
        * \return false in case of non-empty map, or missing definition from a
-       *         tubex::Function object, true otherwise
+       *         TFunction object, true otherwise
        */
       bool not_defined() const;
 
@@ -197,51 +208,69 @@ namespace tubex
        * \note The trajectory must not be defined from an analytic function
        *
        * \param y local value of the trajectory
-       * \param t the temporal key (double, must belong to the trajectory domain)
+       * \param t the temporal key (double, must belong to the trajectory's tdomain)
        */
       void set(double y, double t);
 
       /**
-       * \brief Truncates the domain of \f$x(\cdot)\f$
+       * \brief Truncates the tdomain of \f$x(\cdot)\f$
        *
-       * \note The new domain must be a subset of the old one
+       * \note The new tdomain must be a subset of the old one
        *
-       * \param domain new Interval domain \f$[t_0,t_f]\f$
+       * \param tdomain new temporal domain \f$[t_0,t_f]\f$
+       * \return a reference to this trajectory
        */
-      void truncate_domain(const ibex::Interval& domain);
+      Trajectory& truncate_tdomain(const ibex::Interval& tdomain);
 
       /**
-       * \brief Shifts the domain \f$[t_0,t_f]\f$ of \f$x(\cdot)\f$
+       * \brief Shifts the tdomain \f$[t_0,t_f]\f$ of \f$x(\cdot)\f$
        *
        * \note If the trajectory is defined from a map of values, the key
        *       of each value will be shifted. In case of a definition from
-       *       an analytic function, only the definition domain will be changed.
+       *       an analytic function, only the tdomain will be changed.
        *
        * \param a the offset value so that \f$[t_0,t_f]:=[t_0-a,t_f-a]\f$
+       * \return a reference to this trajectory
        */
-      void shift_domain(double a);
+      Trajectory& shift_tdomain(double a);
 
       /**
        * \brief Samples the trajectory by adding new points to the map of values
        *
        * \note If the trajectory is defined as an analytic function, then the object is
-       *       transformed into a map of values and the tubex::Function object is deleted.
+       *       transformed into a map of values and the TFunction object is deleted.
        *
        * \param timestep sampling value \f$\delta\f$ for the temporal discretization (double)
+       * \return a reference to this trajectory
        */
-      void sample(double timestep);
+      Trajectory& sample(double timestep);
 
       /**
        * \brief Samples this trajectory so that it will share the same sampling of \f$x(\cdot)\f$
        *
        * \note If the trajectory is defined as an analytic function, then the object is
-       *       transformed into a map of values and the tubex::Function object is deleted.
+       *       transformed into a map of values and the TFunction object is deleted.
        *
-       * \note The previous sampling of this tube is preserved
+       * \note The previous sampling of this trajectory is preserved
        *
        * \param x the Trajectory from which the new sampling will come from
+       * \return a reference to this trajectory
        */
-      void sample(const Trajectory& x);
+      Trajectory& sample(const Trajectory& x);
+
+      /**
+       * \brief Makes a trajectory continous by avoiding infinite slopes
+       *
+       * \note This is mainly used when angles are expressed between \f$[-\pi,\pi]\f$,
+       *       which produces troublesome discontinuities. For instance, a tube directly
+       *       built from such discontinuous trajectory will be made of very large slices,
+       *       inducing unwanted pessimism.
+       *
+       * \note The previous sampling of this trajectory is preserved
+       *
+       * \return a reference to this trajectory
+       */
+      Trajectory& make_continuous();
 
       /// @}
       /// \name Integration
@@ -288,7 +317,7 @@ namespace tubex
        * \note This function only works with trajectories defined as a map of values.
        * \note A uniform grid spacing is assumed.
        * 
-       * \param t the temporal key (double, must belong to the trajectory domain)
+       * \param t the temporal key (double, must belong to the trajectory's tdomain)
        * \return a derivative trajectory
        */
       double finite_diff(double t) const;
@@ -397,27 +426,23 @@ namespace tubex
       const ibex::IntervalVector codomain_box() const;
 
       /**
-       * \brief Sets a value \f$y\f$ at \f$t\f$: \f$x(t)=y\f$
-       *
-       * \note This protected method updates the map even in case of analytic definition
-       *
-       * \param y local value of the trajectory
-       * \param t the temporal key (double, must belong to the trajectory domain)
-       */
-      void set_map_value(double y, double t);
-
-      /**
        * \brief Computes the envelope of trajectory values
        */
       void compute_codomain();
 
       // Class variables:
 
-        ibex::Interval m_domain = ibex::Interval::EMPTY_SET; //!< temporal domain \f$[t_0,t_f]\f$ of the trajectory
+        ibex::Interval m_tdomain = ibex::Interval::EMPTY_SET; //!< temporal domain \f$[t_0,t_f]\f$ of the trajectory
         ibex::Interval m_codomain = ibex::Interval::EMPTY_SET; //!< envelope of the values of the trajectory
-        // A trajectory is defined either by a Function or a map of values
-        tubex::Function *m_function = NULL; //!< optional pointer to the analytic expression of this trajectory
-        std::map<double,double> m_map_values; //!< optional map of values <t,y>: \f$x(t)=y\f$
+        
+        // A trajectory is defined either by a TFunction or a map of values
+        TrajDefnType m_traj_def_type = TrajDefnType::MAP_OF_VALUES; //!< definition type
+
+        //union
+        //{
+          TFunction *m_function = NULL; //!< optional pointer to the analytic expression of this trajectory
+          std::map<double,double> m_map_values; //!< optional map of values <t,y>: \f$x(t)=y\f$
+        //};
 
       friend void deserialize_Trajectory(std::ifstream& bin_file, Trajectory *&traj);
       friend void deserialize_TrajectoryVector(std::ifstream& bin_file, TrajectoryVector *&traj);

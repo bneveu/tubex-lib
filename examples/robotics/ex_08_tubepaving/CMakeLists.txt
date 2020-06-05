@@ -1,25 +1,32 @@
 # ==================================================================
-#  tubex-lib / example - cmake configuration file
+#  tubex-lib / robotics example - cmake configuration file
 # ==================================================================
 
-# Settings
+  cmake_minimum_required(VERSION 3.0.2)
+  project(tubex_rob_08 LANGUAGES CXX)
 
-  cmake_minimum_required(VERSION 3.0)
-  set(CMAKE_CXX_COMPILER g++-5)
-  set(CMAKE_CXX_STANDARD 11)
-  #set(CMAKE_CXX_FLAGS ${CMAKE_CSS_FLAGS} "-DNDEBUG") # comment for debug
+# Adding IBEX
 
+  # In case you installed IBEX in a local directory, you need 
+  # to specify its path with the CMAKE_PREFIX_PATH option.
+  # set(CMAKE_PREFIX_PATH "~/ibex-lib/build_install")
 
-# Dependencies
+  find_package(IBEX REQUIRED)
+  ibex_init_common() # IBEX should have installed this function
+  message(STATUS "Found IBEX version ${IBEX_VERSION}")
 
-  get_filename_component(TUBEX_ROOT "../../../" ABSOLUTE) # used for find_packages modules
-  list(APPEND CMAKE_MODULE_PATH "${TUBEX_ROOT}/cmake/modules") # location of find_package modules
-  find_package(TubexLib REQUIRED)
-  find_package(IbexLib REQUIRED)
-  include_directories("${TUBEX_INCLUDE_DIR}" "${IBEX_INCLUDE_DIR}")
+# Adding Tubex
 
+  # In case you installed Tubex in a local directory, you need 
+  # to specify its path with the CMAKE_PREFIX_PATH option.
+  # set(CMAKE_PREFIX_PATH "~/tubex-lib/build_install")
 
-# Example sources
+  find_package(TUBEX REQUIRED)
+  message(STATUS "Found Tubex version ${TUBEX_VERSION}")
 
-  add_executable(rob_08_tubepaving main.cpp)
-  target_link_libraries(rob_08_tubepaving ${IBEX_LIBRARY} ${TUBEX_LIBRARY} ${IBEX_LIBRARY})
+# Compilation
+
+  add_executable(${PROJECT_NAME} main.cpp)
+  target_compile_options(${PROJECT_NAME} PUBLIC ${TUBEX_CXX_FLAGS})
+  target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${TUBEX_INCLUDE_DIRS})
+  target_link_libraries(${PROJECT_NAME} PUBLIC ${TUBEX_LIBRARIES} Ibex::ibex ${TUBEX_LIBRARIES})

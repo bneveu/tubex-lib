@@ -8,10 +8,6 @@
  *              the GNU Lesser General Public License (LGPL).
  */
 
-#include <cstdio>
-#include <string>
-#include <iostream>
-#include <sstream>
 #include "tubex_Figure.h"
 
 // A real value to display unbounded slices:
@@ -71,24 +67,17 @@ namespace tubex
     m_width = width; m_height = height;
   }
 
-  string Figure::add_suffix(const string& name, int id)
-  {
-    ostringstream o;
-    o << name << "_" << id;
-    return o.str();
-  }
-
   double Figure::trunc_inf(double x)
   {
     return (x == POS_INFINITY ? BOUNDED_INFINITY : (x == NEG_INFINITY ? -BOUNDED_INFINITY : x));
   }
 
-  const Interval Figure::trunc_inf(const ibex::Interval& x)
+  const Interval Figure::trunc_inf(const Interval& x)
   {
     return Interval(trunc_inf(x.lb()), trunc_inf(x.ub()));
   }
 
-  const IntervalVector Figure::trunc_inf(const ibex::IntervalVector& x)
+  const IntervalVector Figure::trunc_inf(const IntervalVector& x)
   {
     IntervalVector trunc_x = x;
     for(int i = 0 ; i < trunc_x.size() ; i++)

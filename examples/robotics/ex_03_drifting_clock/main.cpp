@@ -14,10 +14,9 @@
  */
 
 #include <tubex.h>
-#include <tubex-robotics.h>
+#include <tubex-rob.h>
 
 using namespace std;
-using namespace ibex;
 using namespace tubex;
 
 int main()
@@ -25,29 +24,29 @@ int main()
   /* =========== PARAMETERS =========== */
 
     double tube_dt = 0.005;
-    Interval domain(0., 13.5);
+    Interval tdomain(0., 13.5);
     float beacon_depth = 10.;
 
   /* =========== INITIALIZATION =========== */
 
-    TubeVector x(domain, 4);
-    x[0] = Tube(domain, tube_dt, tubex::Function("100*cos(t)+[80,100]"));
-    x[1] = Tube(domain, tube_dt, tubex::Function("100*sin(t)+[10,30]"));
-    x[2] = Tube(domain, tube_dt, tubex::Function("-100*sin(t)+[-0.1,0.1]"));
-    x[3] = Tube(domain, tube_dt, tubex::Function("100*cos(t)+[-0.1,0.1]"));
+    TubeVector x(tdomain, 4);
+    x[0] = Tube(tdomain, tube_dt, TFunction("100*cos(t)+[80,100]"));
+    x[1] = Tube(tdomain, tube_dt, TFunction("100*sin(t)+[10,30]"));
+    x[2] = Tube(tdomain, tube_dt, TFunction("-100*sin(t)+[-0.1,0.1]"));
+    x[3] = Tube(tdomain, tube_dt, TFunction("100*cos(t)+[-0.1,0.1]"));
     
-    TubeVector y(domain, 2);
+    TubeVector y(tdomain, 2);
     y[0] = sqrt(sqr(x[0]) + sqr(x[1]) + ibex::sqr(beacon_depth));
     y[1] = (x[0]*x[2] + x[1]*x[3]) / y[0];
     
-    TubeVector h(domain, 2);
-    h[1] = Tube(domain, tube_dt, tubex::Function("[0.08,0.12]*t+[0.97,1.08]"));
+    TubeVector h(tdomain, 2);
+    h[1] = Tube(tdomain, tube_dt, TFunction("[0.08,0.12]*t+[0.97,1.08]"));
     h[0] = h[1].primitive();
 
   /* =========== GRAPHICS =========== */
 
-    Trajectory y_truth(domain, tubex::Function("sqrt((90+100*cos(t))^2 + (20+100*sin(t))^2 + 100)"));
-    Trajectory h_truth(domain, tubex::Function("0.045*t^2+0.98*t"));
+    Trajectory y_truth(tdomain, TFunction("sqrt((90+100*cos(t))^2 + (20+100*sin(t))^2 + 100)"));
+    Trajectory h_truth(tdomain, TFunction("0.045*t^2+0.98*t"));
 
     vibes::beginDrawing();
 
@@ -77,7 +76,7 @@ int main()
 
     CtcDeriv ctc_deriv;
     CtcEval ctc_eval;
-    ctc_eval.enable_temporal_propagation(false); // faster use
+    ctc_eval.enable_time_propag(false); // faster use
 
     int k = 0;
     double volume;
@@ -88,7 +87,7 @@ int main()
       volume = y.volume() + h.volume();
       cout << "Computation step " << k << "..." << endl;
 
-      for(int i = 0 ; i < v_obs.size() ; i++)
+      for(size_t i = 0 ; i < v_obs.size() ; i++)
       {
         ctc_eval.contract(v_obs[i][1], v_obs[i][0], h[0], h[1]);
         ctc_eval.contract(v_obs[i][1], v_obs[i][2], y[0], y[1]);
@@ -107,5 +106,5 @@ int main()
     vibes::endDrawing();
 
   // Checking if this example still works:
-  return (y[0].contains(y_truth) == YES && h[0].contains(h_truth) == YES) ? EXIT_SUCCESS : EXIT_FAILURE;
+  return (y[0].contains(y_truth) == BoolInterval::YES && h[0].contains(h_truth) == BoolInterval::YES) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

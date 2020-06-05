@@ -35,7 +35,7 @@ namespace tubex
    * \enum TubeColorType
    * \brief Defines a set of colors for tube display
    */
-  enum TubeColorType { FOREGROUND, BACKGROUND, SLICES, GATES, POLYGONS };
+  enum class TubeColorType { FOREGROUND, BACKGROUND, SLICES, GATES, POLYGONS };
 
   /**
    * \class VIBesFigTube
@@ -81,7 +81,7 @@ namespace tubex
       /**
        * \brief Set the position of the temporal cursor of this figure
        *
-       * \param t position on the temporal domain
+       * \param t position on the tdomain
        */
       void set_cursor(double t);
 
@@ -169,7 +169,7 @@ namespace tubex
        * \param color_type the `TubeColorType` key for which the value will be set
        * \param color the new color to be specified for the given type
        */
-      void set_tube_color(const Tube *tube, int color_type, const std::string& color);
+      void set_tube_color(const Tube *tube, TubeColorType color_type, const std::string& color);
 
       /**
        * \brief Reset the background of a given tube
@@ -276,7 +276,7 @@ namespace tubex
        * \param tube the const pointer to the Tube object for which a group will be created
        * \param color_type the `TubeColorType` key related to the new group
        */
-      void create_group_color(const Tube *tube, int color_type);
+      void create_group_color(const Tube *tube, TubeColorType color_type);
 
       /**
        * \brief Creates all the VIBes groups related to the given tube
@@ -317,7 +317,7 @@ namespace tubex
        * \brief Draws a gate
        *
        * \param gate the codomain
-       * \param t the domain input
+       * \param t the tdomain input
        * \param params VIBes parameters related to the gate (for groups)
        */
       void draw_gate(const ibex::Interval& gate, double t, const vibes::Params& params);
@@ -339,7 +339,7 @@ namespace tubex
       struct FigTubeParams
       {
         std::string name; //!< human readable identifier of the tube
-        std::map<int,std::string> m_colors; //!< map of colors `<TubeColorType,html_color_code>`
+        std::map<TubeColorType,std::string> m_colors; //!< map of colors `<TubeColorType,html_color_code>`
         const Tube *tube_copy = NULL; //!< to display previous values in background, before any new contraction
         const Tube *tube_derivative = NULL; //!< to display thinner envelopes (polygons) enclosed by the slices
       };

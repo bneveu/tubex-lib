@@ -15,10 +15,9 @@
  */
 
 #include <tubex.h>
-#include <tubex-robotics.h>
+#include <tubex-rob.h>
 
 using namespace std;
-using namespace ibex;
 using namespace tubex;
 
 TubeVector *x, *v;
@@ -36,12 +35,12 @@ int main(int argc, char** argv)
   /* =========== LOADING DATA =========== */
 
     float dt = 0.01;
-    Interval domain(-1., 10.);
-    TrajectoryVector x_truth(domain, tubex::Function("(10*cos(t)+t;5*sin(2*t)+t)"));
-    x = new TubeVector(domain, dt, 2);
-    v = new TubeVector(domain, dt, tubex::Function("(-10*sin(t)+1+[-0.2,0.2];10*cos(2*t)+1+[-0.2,0.2])"));
+    Interval tdomain(-1., 10.);
+    TrajectoryVector x_truth(tdomain, TFunction("(10*cos(t)+t;5*sin(2*t)+t)"));
+    x = new TubeVector(tdomain, dt, 2);
+    v = new TubeVector(tdomain, dt, TFunction("(-10*sin(t)+1+[-0.2,0.2];10*cos(2*t)+1+[-0.2,0.2])"));
 
-    x->set(x_truth(domain.lb()), domain.lb());
+    x->set(x_truth(tdomain.lb()), tdomain.lb());
 
     CtcDeriv ctc_deriv;
     ctc_deriv.contract(*x, *v);
@@ -81,18 +80,16 @@ int main(int argc, char** argv)
     fig_map.add_tube(x, "x", 0, 1);
     fig_map.add_trajectory(&x_truth, "x*", 0, 1);
     fig_map.set_trajectory_color(&x_truth, colormap, &traj_colormap);
-    fig_map.show(0.);
+    fig_map.show(1.);
 
     vector<ConnectedSubset> v_loops;
 
     v_loops = tplane.get_detected_loops();
-    cout << v_loops.size() << endl;
-    for(int i = 0 ; i < v_loops.size() ; i++)
+    for(size_t i = 0 ; i < v_loops.size() ; i++)
       fig_tplane.draw_box(v_loops[i].box(), "red");
 
     v_loops = tplane.get_proven_loops();
-    cout << v_loops.size() << endl;
-    for(int i = 0 ; i < v_loops.size() ; i++)
+    for(size_t i = 0 ; i < v_loops.size() ; i++)
       fig_tplane.draw_box(v_loops[i].box(), "green");
 
     vibes::endDrawing();
