@@ -26,7 +26,7 @@ namespace tubex
 
 		/*FORWARD Phase*/
 		for (int i = 0 ; i < input_times.size() ; i++){
-			ctc_integration.contract(x,v,input_times[i],FORWARD);
+		  ctc_integration.contract(x,v,input_times[i],TimePropag::FORWARD);
 			int ii = 0;
 			for (int j = i+1 ; j < input_times.size() ; j++){
 				if (ctc_integration.get_finaltime() > input_times[j])
@@ -37,7 +37,7 @@ namespace tubex
 
 		/*BACKWARD Phase*/
 		for (int i = input_times.size()-1 ; i >= 0 ; i--){
-			ctc_integration.contract(x,v,input_times[i],BACKWARD);
+		  ctc_integration.contract(x,v,input_times[i],TimePropag::BACKWARD);
 			int ii = 0;
 			for (int j = i ; j >=0 ; j--){
 				if (ctc_integration.get_finaltime() < input_times[j])

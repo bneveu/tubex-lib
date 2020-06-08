@@ -39,10 +39,10 @@ namespace tubex
       int picard_iterations() const;
 
       /* the Picard algorithm for the kth slices of the tubeVector tubr */
-      void contract_picard_slice(const tubex::Fnc& f,
+      void contract_picard_slice(const TFnc& f,
                                TubeVector& tube,
                                int k,
-			       TPropagation t_propa);
+			       TimePropag t_propa);
       void  set_picard_subslices (int nsubslices);
 
 
@@ -50,7 +50,7 @@ namespace tubex
       void contract_picard_tubeslice(const TFnc& f,
                                TubeVector& tube,
                                int & k,
-			       TPropagation t_propa);
+			       TimePropag t_propa);
       
 
       void contract_kth_slices(const TFnc& f,

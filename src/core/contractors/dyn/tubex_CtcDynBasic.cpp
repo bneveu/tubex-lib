@@ -6,24 +6,24 @@ using namespace ibex;
 
 namespace tubex
 {
-	CtcDynBasic::CtcDynBasic(tubex::Fnc& fnc, double prec): fnc(fnc), prec(prec)
+	CtcDynBasic::CtcDynBasic(TFnc& fnc, double prec): fnc(fnc), prec(prec)
 	{
 		/*check input*/
 		assert(prec >= 0);
 	}
 
-	bool CtcDynBasic::contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa)
+	bool CtcDynBasic::contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa)
 	{
 		/*check if the domains are the same*/
-		Interval to_try(x_slice[0]->domain());
+		Interval to_try(x_slice[0]->tdomain());
 		for (int i = 1 ; i < x_slice.size(); i++)
-			assert(to_try == x_slice[i]->domain());
+			assert(to_try == x_slice[i]->tdomain());
 
 		//check if the gates used to contract are bounded
 		for (int i = 0 ; i < x_slice.size(); i++){
-			if ((t_propa & FORWARD) && (x_slice[0]->input_gate().is_unbounded()))
+		  if ((t_propa & TimePropag::FORWARD) && (x_slice[0]->input_gate().is_unbounded()))
 				return false;
-			else if ((t_propa & BACKWARD) && (x_slice[0]->output_gate().is_unbounded()))
+			else if ((t_propa & TimePropag::BACKWARD) && (x_slice[0]->output_gate().is_unbounded()))
 				return false;
 		}
 
@@ -108,7 +108,7 @@ namespace tubex
 	{
 		/*envelope*/
 		IntervalVector envelope(x_slice.size()+1);
-		envelope[0] = x.domain();
+		envelope[0] = x.tdomain();
 
 		for (int i = 0 ; i < x_slice.size() ; i++){
 			if (i==pos)

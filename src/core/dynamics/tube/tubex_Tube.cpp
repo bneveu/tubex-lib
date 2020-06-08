@@ -604,7 +604,7 @@ namespace tubex
 
     const Interval Tube::operator()(double t) const
     {
-      assert(!isnan(t));
+      assert(!std::isnan(t));
       assert(tdomain().contains(t));
       return slice(t)->operator()(t);
     }

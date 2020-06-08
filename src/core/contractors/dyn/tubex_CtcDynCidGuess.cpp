@@ -14,24 +14,24 @@ using namespace ibex;
 
 namespace tubex
 {
-	CtcDynCidGuess::CtcDynCidGuess(tubex::Fnc& fnc, double prec): fnc(fnc), prec(prec)
+  CtcDynCidGuess::CtcDynCidGuess(TFnc& fnc, double prec): fnc(fnc), prec(prec)
 	{
 		//assert(prec >= 0);
 		set_prec(0.05);
 	}
 
-	bool CtcDynCidGuess::contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa)
+	bool CtcDynCidGuess::contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa)
 	{
 		//checks that the domain of each slice is the same.
-		Interval to_try(x_slice[0]->domain());
+		Interval to_try(x_slice[0]->tdomain());
 		for (int i = 1 ; i < x_slice.size(); i++)
-			//assert(to_try == x_slice[i]->domain());
+			//assert(to_try == x_slice[i]->tdomain());
 
 		//check if the gates used to contract are bounded
 		for (int i = 0 ; i < x_slice.size(); i++){
-			if ((t_propa & FORWARD) && (x_slice[0]->input_gate().is_unbounded()))
+			if ((t_propa & TimePropag::FORWARD) && (x_slice[0]->input_gate().is_unbounded()))
 				return false;
-			else if ((t_propa & BACKWARD) && (x_slice[0]->output_gate().is_unbounded()))
+			else if ((t_propa & TimePropag::BACKWARD) && (x_slice[0]->output_gate().is_unbounded()))
 				return false;
 		}
 		//polygone method setter
@@ -73,11 +73,11 @@ namespace tubex
 			for (int i = 0 ; i < x_slice.size() ; i++){
 				double aux_envelope = x_slice[i]->codomain().diam();
 				Interval remove_ub,remove_lb;
-				if (t_propa & FORWARD){
+				if (t_propa & TimePropag::FORWARD){
 					remove_ub = Interval(x_slice_bounds[i].output_gate().ub(),x_slice[i]->output_gate().ub());
 					remove_lb = Interval(x_slice[i]->output_gate().lb(),x_slice_bounds[i].output_gate().lb());
 				}
-				else if (t_propa & BACKWARD){
+				else if (t_propa & TimePropag::BACKWARD){
 					remove_ub = Interval(x_slice_bounds[i].input_gate().ub(),x_slice[i]->input_gate().ub());
 					remove_lb = Interval(x_slice[i]->input_gate().lb(),x_slice_bounds[i].input_gate().lb());
 				}
@@ -115,7 +115,7 @@ namespace tubex
 	{
 		/*envelope*/
 		IntervalVector envelope(x_slice.size()+1);
-		envelope[0] = x.domain();
+		envelope[0] = x.tdomain();
 		for (int i = 0 ; i < x_slice.size() ; i++){
 			if (i==pos)
 				envelope[i+1] = x.codomain();
@@ -129,7 +129,7 @@ namespace tubex
 	{
 		/*envelope*/
 		IntervalVector envelope(x_slice.size()+1);
-		envelope[0] = x.domain();
+		envelope[0] = x.tdomain();
 
 		for (int i = 0 ; i < x_slice.size() ; i++){
 			if (i==pos)
@@ -203,17 +203,17 @@ namespace tubex
 		}
 	}
 
-	void CtcDynCidGuess::create_slices(Slice& x_slice, std::vector<Interval> & x_slices, TPropagation t_propa)
+	void CtcDynCidGuess::create_slices(Slice& x_slice, std::vector<Interval> & x_slices, TimePropag t_propa)
 	{
 
 		/*Varcid in the input gate*/
-		if (t_propa & FORWARD){
+		if (t_propa & TimePropag::FORWARD){
 			x_slices.push_back(Interval(x_slice.input_gate().lb()));
 			x_slices.push_back(Interval(x_slice.input_gate().ub()));
 		}
 
 		/*Varcid in the output gate*/
-		else if (t_propa & BACKWARD){
+		else if (t_propa & TimePropag::BACKWARD){
 			x_slices.push_back(Interval(x_slice.output_gate().lb()));
 			x_slices.push_back(Interval(x_slice.output_gate().ub()));
 		}
@@ -234,11 +234,11 @@ namespace tubex
 	    return s;
 	}
 
-	void CtcDynCidGuess::create_corners(std::vector<Slice> x_slices, std::vector< std::vector<double> > & points, TPropagation t_propa){
+	void CtcDynCidGuess::create_corners(std::vector<Slice> x_slices, std::vector< std::vector<double> > & points, TimePropag t_propa){
 
 		std::vector< std::vector<double> > aux_points;
 		//for each dimension, obtain the corresponding corners
-		if (t_propa & FORWARD){
+		if (t_propa & TimePropag::FORWARD){
 			for (int i=0 ; i < x_slices.size() ; i++){
 				vector<double> aux;
 				aux.clear();
@@ -247,7 +247,7 @@ namespace tubex
 				aux_points.push_back(aux);
 			}
 		}
-		else if(t_propa & BACKWARD){
+		else if(t_propa & TimePropag::BACKWARD){
 			for (int i=0 ; i < x_slices.size() ; i++){
 				vector<double> aux;
 				aux.clear();
@@ -260,7 +260,7 @@ namespace tubex
 		points = cart_product(aux_points);
 	}
 
-	void CtcDynCidGuess::var3Bcheck(ibex::Interval remove_bound ,int bound, int pos ,std::vector<Slice*> & x_slice, std::vector<Slice*> v_slice, TPropagation t_propa)
+	void CtcDynCidGuess::var3Bcheck(ibex::Interval remove_bound ,int bound, int pos ,std::vector<Slice*> & x_slice, std::vector<Slice*> v_slice, TimePropag t_propa)
 	{
 
 		ctc_deriv.set_fast_mode(false);
@@ -271,9 +271,9 @@ namespace tubex
 			x_slice_bounds.push_back(*x_slice[i]);
 			v_slice_bounds.push_back(*v_slice[i]);
 		}
-		if (t_propa & FORWARD)
+		if (t_propa & TimePropag::FORWARD)
 			x_slice_bounds[pos].set_output_gate(remove_bound);
-		else if (t_propa & BACKWARD)
+		else if (t_propa & TimePropag::BACKWARD)
 			x_slice_bounds[pos].set_input_gate(remove_bound);
 
 		/*try to remove the complete interval*/
@@ -290,13 +290,13 @@ namespace tubex
 //			if (max_iterations>=50) set_max_it(true);  // max iterations reached
 			/*if something is empty means that we can remove the complete interval*/
 			if (x_slice_bounds[i].is_empty()){
-				if (t_propa & FORWARD){
+				if (t_propa & TimePropag::FORWARD){
 					if (bound == ub)
 						x_slice[pos]->set_output_gate(Interval(x_slice[pos]->output_gate().lb(),remove_bound.lb()));
 					else if (bound == lb)
 						x_slice[pos]->set_output_gate(Interval(remove_bound.ub(),x_slice[pos]->output_gate().ub()));
 				}
-				if (t_propa & BACKWARD){
+				if (t_propa & TimePropag::BACKWARD){
 					if (bound == ub)
 						x_slice[pos]->set_input_gate(Interval(x_slice[pos]->input_gate().lb(),remove_bound.lb()));
 					else if (bound == lb)
@@ -307,13 +307,13 @@ namespace tubex
 		}
 
 		/*update the guess with x_slice_bounds*/
-		if (t_propa & FORWARD){
+		if (t_propa & TimePropag::FORWARD){
 			if (bound == ub)
 				remove_bound = Interval(remove_bound.lb(),x_slice_bounds[pos].output_gate().ub());
 			else if (bound == lb)
 				remove_bound = Interval(x_slice_bounds[pos].output_gate().lb(),remove_bound.ub());
 		}
-		else if (t_propa & BACKWARD){
+		else if (t_propa & TimePropag::BACKWARD){
 			if (bound == ub)
 				remove_bound = Interval(remove_bound.lb(),x_slice_bounds[pos].input_gate().ub());
 			else if (bound == lb)
@@ -345,9 +345,9 @@ namespace tubex
 					else if (get_dpolicy() == 2)
 						subinterval_removal = Interval(remove_bound.lb(),remove_bound.lb()+diam_removal);
 				}
-				if (t_propa & FORWARD)
+				if (t_propa & TimePropag::FORWARD)
 					x_slice_bounds[pos].set_output_gate(subinterval_removal);
-				else if (t_propa & BACKWARD)
+				else if (t_propa & TimePropag::BACKWARD)
 					x_slice_bounds[pos].set_input_gate(subinterval_removal);
 				success = false;
 				for (int i = 0 ;  i < x_slice_bounds.size() ; i++){
@@ -389,13 +389,13 @@ namespace tubex
 		}
 
 		/*update the bounds*/
-		if (t_propa & FORWARD){
+		if (t_propa & TimePropag::FORWARD){
 			if (bound==ub)
 				x_slice[pos]->set_output_gate(Interval(x_slice[pos]->output_gate().lb(),remove_bound.ub()));
 			else if (bound==lb)
 				x_slice[pos]->set_output_gate(Interval(remove_bound.lb(),x_slice[pos]->output_gate().ub()));
 		}
-		else if (t_propa & BACKWARD){
+		else if (t_propa & TimePropag::BACKWARD){
 			if (bound==ub)
 				x_slice[pos]->set_input_gate(Interval(x_slice[pos]->input_gate().lb(),remove_bound.ub()));
 			else if (bound==lb)
@@ -403,7 +403,7 @@ namespace tubex
 		}
 	}
 
-	void CtcDynCidGuess::AtomicPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TPropagation t_propa){
+	void CtcDynCidGuess::AtomicPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TimePropag t_propa){
 
 
 		for (int i = 0 ; i < x_slice.size() ;i++){
@@ -423,9 +423,9 @@ namespace tubex
 				Slice aux_slice_x(x_slice[i]);
 				Slice aux_slice_v(v_slice[i]);
 
-				if (t_propa & FORWARD)
+				if (t_propa & TimePropag::FORWARD)
 					aux_slice_x.set_input_gate(x_subslices[j]);
-				else if (t_propa & BACKWARD)
+				else if (t_propa & TimePropag::BACKWARD)
 					aux_slice_x.set_output_gate(x_subslices[j]);
 
 				/*Fixpoint for each sub-slice at each tube*/
@@ -442,10 +442,10 @@ namespace tubex
 
 				if (max_iterations>=50) set_max_it(true);  // max iterations reached
 				/*The union of the current guess is made.*/
-				if (t_propa & BACKWARD){
+				if (t_propa & TimePropag::BACKWARD){
 					hull_input_x |= aux_slice_x.input_gate(); hull_input_v |= aux_slice_v.input_gate();
 				}
-				else if (t_propa & FORWARD){
+				else if (t_propa & TimePropag::FORWARD){
 					hull_output_x |= aux_slice_x.output_gate(); hull_output_v |=aux_slice_v.output_gate();
 				}
 				hull_codomain_x |= aux_slice_x.codomain(); hull_codomain_v |= aux_slice_v.codomain();
@@ -453,16 +453,16 @@ namespace tubex
 
 			/*Intersection in all the dimensions*/
 			x_slice[i].set_envelope(hull_codomain_x & x_slice[i].codomain() );  v_slice[i].set_envelope(hull_codomain_v & v_slice[i].codomain());
-			if (t_propa & BACKWARD){
+			if (t_propa & TimePropag::BACKWARD){
 				x_slice[i].set_input_gate(hull_input_x & x_slice[i].input_gate()); v_slice[i].set_input_gate(hull_input_v & v_slice[i].input_gate());
 			}
-			else if (t_propa & FORWARD){
+			else if (t_propa & TimePropag::FORWARD){
 				x_slice[i].set_output_gate(hull_output_x & x_slice[i].output_gate()); v_slice[i].set_output_gate(hull_output_v & x_slice[i].output_gate());
 			}
 		}
 	}
 
-	void CtcDynCidGuess::FullPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TPropagation t_propa){
+  void CtcDynCidGuess::FullPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TimePropag t_propa){
 
 			/*create the contractor queue: format contraint - variable, 0: for ctc_deriv, 1 for fwd*/
 			std::deque< vector<int> > contractorQ;
@@ -520,17 +520,17 @@ namespace tubex
 
 					/*Set the gate depending on the direction of the contraction*/
 					if (get_s_corn() == 0){
-						if (t_propa & FORWARD)
+						if (t_propa & TimePropag::FORWARD)
 							aux_slice_x[i].set_input_gate(x_subslices[k]);
-						else if (t_propa & BACKWARD)
+						else if (t_propa & TimePropag::BACKWARD)
 							aux_slice_x[i].set_output_gate(x_subslices[k]);
 					}
 					else if (get_s_corn() == 1){
-						if (t_propa & FORWARD)
+						if (t_propa & TimePropag::FORWARD)
 							for (int tt = 0 ; tt < points[k].size() ; tt++)
 								aux_slice_x[tt].set_input_gate(points[k][tt]);
 
-						else if (t_propa & BACKWARD)
+						else if (t_propa & TimePropag::BACKWARD)
 							for (int tt = 0 ; tt < points[k].size() ; tt++)
 								aux_slice_x[tt].set_output_gate(points[k][tt]);
 					}

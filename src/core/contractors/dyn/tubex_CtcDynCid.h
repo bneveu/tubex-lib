@@ -8,7 +8,7 @@
 #ifndef __TUBEX_CTCDYNCID_H__
 #define __TUBEX_CTCDYNCID_H__
 
-#include "tubex_Ctc.h"
+#include "tubex_DynCtc.h"
 #include "tubex_Slice.h"
 #include "tubex_CtcDeriv.h"
 #include <vector>
@@ -17,7 +17,7 @@
 namespace tubex
 {
 
-	class CtcDynCid : public Ctc{
+	class CtcDynCid : public DynCtc{
 
 	public:
 		/*
@@ -27,16 +27,16 @@ namespace tubex
 		 * defined by the variable $s_{cid}$). Then two contractors are applied: $C_{Deriv}$
 		 * and C_{fwd}.
 		 */
-		CtcDynCid(tubex::Fnc& fnc,int scid=8, double prec=0.);
+		CtcDynCid(TFnc& fnc,int scid=8, double prec=0.);
 		/*
 		 * This method performs a contraction at the Slice level.
 		 * Note that the timesteps between the Tubes of x and v must be identically the same.
 		 */
-		bool contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa);
+		bool contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa);
 		/*
 		 * creates a certain number of subslices to be treated
 		 */
-		void create_subslices(Slice & x_slice, std::vector<ibex::Interval> & slices, TPropagation t_propa);
+		void create_subslices(Slice & x_slice, std::vector<ibex::Interval> & slices, TimePropag t_propa);
 
 		/*
 		 * ctc_fwd manages to make an evaluation of the current Slices in order to contract and update v
@@ -71,15 +71,15 @@ namespace tubex
 		/*
 		 * todo: add comments
 		*/
-		void FullPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa);
+		void FullPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa);
 		/*
 		 * todo: add comments
 		*/
-		void AtomicPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa);
+		void AtomicPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa);
 	private:
 		int scid;
 		double prec;
-		tubex::Fnc& fnc;
+		TFnc& fnc;
 		CtcDeriv ctc_deriv;
 		int engine = 0;  //by default the propagation engine is atomic (faster)
 	};

@@ -109,7 +109,7 @@
 		  ${CMAKE_CURRENT_SOURCE_DIR}/contractors/dyn/tubex_CtcDynBasic.cpp
 		  ${CMAKE_CURRENT_SOURCE_DIR}/contractors/dyn/tubex_CtcDynBasic.h
 		  ${CMAKE_CURRENT_SOURCE_DIR}/contractors/dyn/tubex_CtcExplicitDE.cpp
-		  ${CMAKE_CURRENT_SOURCE_DIR}/contractors/dyn/tubex_CtcExplicit.h	
+		  ${CMAKE_CURRENT_SOURCE_DIR}/contractors/dyn/tubex_CtcExplicitDE.h	
 
                   ${CMAKE_CURRENT_SOURCE_DIR}/contractors/tubex_predef_contractors.cpp
                   ${CMAKE_CURRENT_SOURCE_DIR}/contractors/tubex_predef_contractors.h

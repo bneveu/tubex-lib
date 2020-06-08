@@ -9,13 +9,13 @@
 #define __TUBEX_CTCEXPLICITDE_H__
 
 #include "tubex_CtcIntegration.h"
-#include "tubex_Ctc.h"
+#include "tubex_DynCtc.h"
 #include <vector>
 
 namespace tubex
 {
 
-	class CtcExplicitDE : public Ctc{
+	class CtcExplicitDE : public DynCtc{
 
 	public:
 

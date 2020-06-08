@@ -551,7 +551,7 @@ const double TubeVector::max_gate_diam(double & t) const
   {
     double max_gate_diam=0; 
     for (int i = 0 ; i < size() ; i++){
-      double ti=(*this)[i].domain().lb();
+      double ti=(*this)[i].tdomain().lb();
       double gate_diam= (*this)[i].max_gate_diam(ti);
       if (gate_diam > max_gate_diam){
 	t=ti;

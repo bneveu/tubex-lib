@@ -15,25 +15,25 @@ using namespace ibex;
 
 namespace tubex
 {
-	CtcDynCid::CtcDynCid(tubex::Fnc& fnc,int scid, double prec): fnc(fnc), scid(scid), prec(prec)
+	CtcDynCid::CtcDynCid(TFnc& fnc,int scid, double prec): fnc(fnc), scid(scid), prec(prec)
 	{
 		/*check inputs*/
 		assert(scid > 0.);
 		assert(prec >= 0);
 	}
 
-	bool CtcDynCid::contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa)
+	bool CtcDynCid::contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa)
 	{
 		//checks that the domain of each slice is the same.
-		Interval to_try(x_slice[0]->domain());
+		Interval to_try(x_slice[0]->tdomain());
 		for (int i = 1 ; i < x_slice.size(); i++)
-			assert(to_try == x_slice[i]->domain());
+			assert(to_try == x_slice[i]->tdomain());
 
 		//check if the gates used to contract are bounded
 		for (int i = 0 ; i < x_slice.size(); i++){
-			if ((t_propa & FORWARD) && (x_slice[0]->input_gate().is_unbounded()))
+			if ((t_propa & TimePropag::FORWARD) && (x_slice[0]->input_gate().is_unbounded()))
 				return false;
-			else if ((t_propa & BACKWARD) && (x_slice[0]->output_gate().is_unbounded()))
+			else if ((t_propa & TimePropag::BACKWARD) && (x_slice[0]->output_gate().is_unbounded()))
 				return false;
 		}
 		//polygone method setter
@@ -80,7 +80,7 @@ namespace tubex
 	{
 		/*envelope*/
 		IntervalVector envelope(x_slice.size()+1);
-		envelope[0] = x.domain();
+		envelope[0] = x.tdomain();
 
 		for (int i = 0 ; i < x_slice.size() ; i++){
 			if (i==pos)
@@ -96,7 +96,7 @@ namespace tubex
 	{
 		/*envelope*/
 		IntervalVector envelope(x_slice.size()+1);
-		envelope[0] = x.domain();
+		envelope[0] = x.tdomain();
 
 		for (int i = 0 ; i < x_slice.size() ; i++){
 			if (i==pos)
@@ -140,7 +140,7 @@ namespace tubex
 
 
 
-	void CtcDynCid::FullPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa){
+	void CtcDynCid::FullPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa){
 
 		/*create the contractor queue: format contraint - variable, 0: for ctc_deriv, 1 for fwd*/
 		std::deque< vector<int> > contractorQ;
@@ -188,9 +188,9 @@ namespace tubex
 				}
 
 				/*Set the gate depending on the direction of the contraction*/
-				if (t_propa & FORWARD)
+				if (t_propa & TimePropag::FORWARD)
 					aux_slice_x[i].set_input_gate(x_subslices[k]);
-				else if (t_propa & BACKWARD)
+				else if (t_propa & TimePropag::BACKWARD)
 					aux_slice_x[i].set_output_gate(x_subslices[k]);
 
 				/*push the first element to the contractor queue*/
@@ -255,7 +255,7 @@ namespace tubex
 		}
 	}
 
-	void CtcDynCid::AtomicPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa){
+	void CtcDynCid::AtomicPropagationEngine(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa){
 
 		for (int i = 0 ; i < x_slice.size() ; i++){
 
@@ -277,9 +277,9 @@ namespace tubex
 				Slice aux_slice_x(*x_slice[i]);
 				Slice aux_slice_v(*v_slice[i]);
 
-				if (t_propa & FORWARD)
+				if (t_propa & TimePropag::FORWARD)
 					aux_slice_x.set_input_gate(x_subslices[j]);
-				else if (t_propa & BACKWARD)
+				else if (t_propa & TimePropag::BACKWARD)
 					aux_slice_x.set_output_gate(x_subslices[j]);
 
 				/*Fixpoint for each sub-slice at each tube*/
@@ -313,10 +313,10 @@ namespace tubex
 		}
 	}
 
-	void CtcDynCid::create_subslices(Slice& x_slice, std::vector<ibex::Interval> & x_slices, TPropagation t_propa)
+	void CtcDynCid::create_subslices(Slice& x_slice, std::vector<ibex::Interval> & x_slices, TimePropag t_propa)
 	{
 		/*Varcid in the input gate*/
-		if (t_propa & FORWARD){
+		if (t_propa & TimePropag::FORWARD){
 			double size_interval = x_slice.input_gate().diam()/get_scid();
 			for (int i = 0 ; i < get_scid() ;i++){
 				x_slices.push_back(Interval(x_slice.input_gate().lb()+i*size_interval,x_slice.input_gate().lb()+size_interval*(i+1)));
@@ -324,7 +324,7 @@ namespace tubex
 		}
 
 		/*Varcid in the output gate*/
-		else if (t_propa & BACKWARD){
+		else if (t_propa & TimePropag::BACKWARD){
 			double size_interval = x_slice.output_gate().diam()/get_scid();
 			for (int i = 0 ; i < get_scid() ;i++){
 				x_slices.push_back(Interval(x_slice.output_gate().lb()+i*size_interval,x_slice.output_gate().lb()+size_interval*(i+1)));

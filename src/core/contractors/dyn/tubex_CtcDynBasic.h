@@ -9,7 +9,7 @@
 #ifndef __TUBEX_CTCDYNBASIC_H__
 #define __TUBEX_CTCDYNBASIC_H__
 
-#include "tubex_Ctc.h"
+#include "tubex_DynCtc.h"
 #include "tubex_Slice.h"
 #include "ibex_Function.h"
 #include "tubex_CtcDeriv.h"
@@ -19,16 +19,16 @@
 namespace tubex
 {
 
-	class CtcDynBasic : public Ctc{
+	class CtcDynBasic : public DynCtc{
 
 	public:
 
-		CtcDynBasic(tubex::Fnc& fnc, double prec = 0.);
+		CtcDynBasic(TFnc& fnc, double prec = 0.);
 		/*
 		 * This method performs a contraction for the TubeVector x.
 		 * Note that the timesteps between the Tubes of x must be identically the same.
 		 */
-		bool contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa);
+		bool contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa);
 		/*
 		 * ctc_fwd manages to make an evaluation of the current Slices in order to contract and update v
 		 */
@@ -52,7 +52,7 @@ namespace tubex
 
 		bool m_reasoning_slice = true;
 		CtcDeriv ctc_deriv;
-		tubex::Fnc& fnc;
+		TFnc& fnc;
 		double prec;
 	};
 }

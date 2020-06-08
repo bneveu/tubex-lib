@@ -81,7 +81,8 @@ namespace tubex
        *
        * \param v_domains vector of Domain pointers
        */
-      virtual void contract(std::vector<Domain*>& v_domains) = 0;
+      //      virtual void contract(std::vector<Domain*>& v_domains) = 0;
+      virtual void contract(std::vector<Domain*>& v_domains);
 
       /**
        * \brief Specifies whether the contractor can impact the tube's slicing or not

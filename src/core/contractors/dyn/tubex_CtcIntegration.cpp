@@ -16,17 +16,17 @@ using namespace ibex;
 
 namespace tubex
 {
-	CtcIntegration::CtcIntegration(tubex::Fnc& fnc, Ctc* slice_ctr): fnc(fnc), slice_ctr(slice_ctr),finaltime(-1)
+	CtcIntegration::CtcIntegration(TFnc& fnc, DynCtc* slice_ctr): fnc(fnc), slice_ctr(slice_ctr),finaltime(-1)
 	{
 
 	}
 
-	void CtcIntegration::contract(TubeVector& x, TubeVector& v, double time_dom, TPropagation t_propa, Ptype p_type)
+	void CtcIntegration::contract(TubeVector& x, TubeVector& v, double time_dom, TimePropag t_propa, Ptype p_type)
 	{
 
 		/*check if everything is ok*/
 		assert(x.size() == v.size());
-		assert(x.domain() == v.domain());
+		assert(x.tdomain() == v.tdomain());
 		assert(TubeVector::same_slicing(x, v));
 		/*cpu time measurement*/
 		clock_t tStart = clock();
@@ -37,7 +37,7 @@ namespace tubex
 
 		/*set where to start with the contraction in the dom=[t0,tf]*/
 		/*if the contraction is from t=t0*/
-		if (time_dom <= x.domain().lb()){
+		if (time_dom <= x.tdomain().lb()){
 			for (int i = 0 ; i < x.size() ; i++){
 				x_slice.push_back(x[i].first_slice());
 				v_slice.push_back(v[i].first_slice());
@@ -45,7 +45,7 @@ namespace tubex
 		}
 
 		/*if the contraction is from t=tf*/
-		else if (time_dom >= x.domain().ub()){
+		else if (time_dom >= x.tdomain().ub()){
 			for (int i = 0 ; i < x.size() ; i++){
 				x_slice.push_back(x[i].last_slice());
 				v_slice.push_back(v[i].last_slice());
@@ -58,7 +58,7 @@ namespace tubex
 				x_slice.push_back(x[i].slice(time_dom));
 				v_slice.push_back(v[i].slice(time_dom));
 			}
-			if (t_propa & FORWARD){
+			if (t_propa & TimePropag::FORWARD){
 				for (int i = 0 ; i < x.size() ; i++){
 					x_slice[i]=x_slice[i]->next_slice();
 					v_slice[i]=v_slice[i]->next_slice();
@@ -68,8 +68,8 @@ namespace tubex
 
 		/*counter for slices*/
 		int nb_slices;
-		if (t_propa & FORWARD) nb_slices = 0;
-		else if (t_propa & BACKWARD) nb_slices = x.nb_slices()-1;
+		if (t_propa & TimePropag::FORWARD) nb_slices = 0;
+		else if (t_propa & TimePropag::BACKWARD) nb_slices = x.nb_slices()-1;
 
 		CtcPicard ctc_picard;
 		ctc_picard.set_picard_subslices(10); //todo: setter for nb of subslices
@@ -77,7 +77,7 @@ namespace tubex
 		//		ctc_picard.preserve_slicing(1);
 		/*todo: how to start from any point inside the tube for picard?*/
 		if (m_slice_picard_mode){
-			if ((time_dom == x.domain().lb()) || (time_dom == x.domain().ub()))
+			if ((time_dom == x.tdomain().lb()) || (time_dom == x.tdomain().ub()))
 				m_slice_picard_mode = true;
 			else
 				m_slice_picard_mode = false;
@@ -122,10 +122,10 @@ namespace tubex
 				if(p_type & integrodiff){
 					idiff_values.push_back(Interval(0.,0.));
 					if (contract_idiff(x_slice,v_slice,x,nb_slices,idiff_values,t_propa)){
-						if (t_propa & FORWARD)
-							finaltime = x_slice[0]->domain().lb();
-						else if (t_propa & BACKWARD)
-							finaltime = x_slice[0]->domain().ub();
+					  if (t_propa & TimePropag::FORWARD)
+							finaltime = x_slice[0]->tdomain().lb();
+						else if (t_propa & TimePropag::BACKWARD)
+							finaltime = x_slice[0]->tdomain().ub();
 						if (m_incremental_mode)
 							return;
 					}
@@ -134,10 +134,10 @@ namespace tubex
 				else if(dynamic_cast <CtcDynCid*> (slice_ctr)){
 					CtcDynCid * cid = dynamic_cast <CtcDynCid*> (slice_ctr);
 					if (!cid->contract(x_slice,v_slice,t_propa)){
-						if (t_propa & FORWARD)
-							finaltime = x_slice[0]->domain().lb();
-						else if (t_propa & BACKWARD)
-							finaltime = x_slice[0]->domain().ub();
+					  if (t_propa & TimePropag::FORWARD)
+							finaltime = x_slice[0]->tdomain().lb();
+						else if (t_propa & TimePropag::BACKWARD)
+							finaltime = x_slice[0]->tdomain().ub();
 						if (m_incremental_mode)
 							return;
 					}
@@ -146,10 +146,10 @@ namespace tubex
 				else if(dynamic_cast <CtcDynCidGuess*> (slice_ctr)){
 					CtcDynCidGuess * cidguess = dynamic_cast <CtcDynCidGuess*> (slice_ctr);
 					if (!cidguess->contract(x_slice,v_slice,t_propa)){
-						if (t_propa & FORWARD)
-							finaltime = x_slice[0]->domain().lb();
-						else if (t_propa & BACKWARD)
-							finaltime = x_slice[0]->domain().ub();
+					  if (t_propa & TimePropag::FORWARD)
+							finaltime = x_slice[0]->tdomain().lb();
+					  else if (t_propa & TimePropag::BACKWARD)
+							finaltime = x_slice[0]->tdomain().ub();
 						if (m_incremental_mode)
 							return;
 					}
@@ -157,10 +157,10 @@ namespace tubex
 				else if(dynamic_cast <CtcDynBasic*> (slice_ctr)){
 					CtcDynBasic * basic = dynamic_cast <CtcDynBasic*> (slice_ctr);
 					if (!basic->contract(x_slice,v_slice,t_propa)){
-						if (t_propa & FORWARD)
-							finaltime = x_slice[0]->domain().lb();
-						else if (t_propa & BACKWARD)
-							finaltime = x_slice[0]->domain().ub();
+					  if (t_propa & TimePropag::FORWARD)
+							finaltime = x_slice[0]->tdomain().lb();
+					  else if (t_propa & TimePropag::BACKWARD)
+							finaltime = x_slice[0]->tdomain().ub();
 						if (m_incremental_mode)
 							return;
 					}
@@ -171,31 +171,31 @@ namespace tubex
 				}
 			}
 			/*continue with the next slice*/
-			if (t_propa & FORWARD){
+			if (t_propa & TimePropag::FORWARD){
 				for (int i = 0 ; i < x.size() ; i++){
 					x_slice[i] = x_slice[i]->next_slice();
 					v_slice[i] = v_slice[i]->next_slice();
 				}
 			}
-			else if (t_propa & BACKWARD){
+			else if (t_propa & TimePropag::BACKWARD){
 				for (int i = 0 ; i < x.size() ; i++){
 					x_slice[i] = x_slice[i]->prev_slice();
 					v_slice[i] = v_slice[i]->prev_slice();
 				}
 			}
 			//for picard_slice
-			if (t_propa & FORWARD) nb_slices++;
-			else if (t_propa & BACKWARD) nb_slices--;
+			if (t_propa & TimePropag::FORWARD) nb_slices++;
+			else if (t_propa & TimePropag::BACKWARD) nb_slices--;
 		}
 
 
-		if (t_propa & FORWARD)
-			finaltime = x.domain().ub();
-		else if (t_propa & BACKWARD)
-			finaltime = x.domain().lb();
+		if (t_propa & TimePropag::FORWARD)
+			finaltime = x.tdomain().ub();
+		else if (t_propa & TimePropag::BACKWARD)
+			finaltime = x.tdomain().lb();
 	}
 
-	void CtcIntegration::contract(TubeVector& x, double time_dom, TPropagation t_propa)
+	void CtcIntegration::contract(TubeVector& x, double time_dom, TimePropag t_propa)
 	{
 		/*v is computed*/
 		TubeVector v=x;
@@ -208,7 +208,7 @@ namespace tubex
 		}
 		while(x_slice[0] != NULL){
 			IntervalVector envelope(x_slice.size()+1);
-			envelope[0] = x_slice[0]->domain();
+			envelope[0] = x_slice[0]->tdomain();
 			for (int j = 0 ; j < x_slice.size() ; j++)
 				envelope[j+1] = x_slice[j]->codomain();
 			envelope = fnc.eval_vector(envelope);
@@ -235,7 +235,7 @@ namespace tubex
 		this->m_slice_picard_mode = slice_picard_mode;
 	}
 
-	std::pair<int,std::pair<double,double>> CtcIntegration::bisection_guess(TubeVector x, TubeVector v, Ctc* slice_ctr, tubex::Function& fnc, int variant){
+	std::pair<int,std::pair<double,double>> CtcIntegration::bisection_guess(TubeVector x, TubeVector v, DynCtc* slice_ctr, TFunction& fnc, int variant){
 
 		//variant 0 -> return immediately as soon as we find a potential gate
 		//variant 1 -> return the largest gate in a slice
@@ -252,7 +252,7 @@ namespace tubex
 
 		/*check if everything is ok*/
 		assert(x.size() == v.size());
-		assert(x.domain() == v.domain());
+		assert(x.tdomain() == v.tdomain());
 		assert(TubeVector::same_slicing(x, v));
 
 		/*init all the tubes*/
@@ -271,9 +271,9 @@ namespace tubex
 			aux_x_slice.clear(); aux_v_slice.clear();
 			/*push slices for forward phase*/
 			//for forward
-			TPropagation t_propa;
+			TimePropag t_propa;
 			if (it == 0){
-				t_propa = FORWARD;
+			  t_propa = TimePropag::FORWARD;
 				for (int i = 0 ; i < x.size() ; i++){
 					x_slice.push_back(x[i].first_slice()); aux_x_slice.push_back(aux_x[i].first_slice());
 					v_slice.push_back(v[i].first_slice()); aux_v_slice.push_back(aux_v[i].first_slice());
@@ -281,7 +281,7 @@ namespace tubex
 			}
 			//for backward
 			else{
-				t_propa = BACKWARD;
+			  t_propa = TimePropag::BACKWARD;
 				for (int i = 0 ; i < x.size() ; i++){
 					x_slice.push_back(x[i].last_slice()); aux_x_slice.push_back(aux_x[i].last_slice());
 					v_slice.push_back(v[i].last_slice()); aux_v_slice.push_back(aux_v[i].last_slice());
@@ -290,15 +290,15 @@ namespace tubex
 
 			while (x_slice[0] != NULL){
 				for (int i = 0 ; i < x.size() ; i++){
-					if (t_propa & FORWARD){
+				  if (t_propa & TimePropag::FORWARD){
 						x_bisection = aux_x_slice[i]->output_gate().mid();
-						t_bisection = aux_x_slice[i]->domain().ub();
+						t_bisection = aux_x_slice[i]->tdomain().ub();
 						gate_diam = aux_x_slice[i]->output_gate().diam();
 						aux_x_slice[i]->set_output_gate(x_bisection);
 					}
-					else if (t_propa & BACKWARD){
+					else if (t_propa & TimePropag::BACKWARD){
 						x_bisection = aux_x_slice[i]->input_gate().mid();
-						t_bisection = aux_x_slice[i]->domain().lb();
+						t_bisection = aux_x_slice[i]->tdomain().lb();
 						gate_diam = aux_x_slice[i]->input_gate().diam();
 						aux_x_slice[i]->set_input_gate(x_bisection);
 					}
@@ -348,13 +348,13 @@ namespace tubex
 						return bisection;
 				}
 
-				if (t_propa & FORWARD){
+				if (t_propa & TimePropag::FORWARD){
 					for (int i = 0 ; i < x.size() ; i++){
 						x_slice[i] = x_slice[i]->next_slice(); aux_x_slice[i] = aux_x_slice[i]->next_slice();
 						v_slice[i] = v_slice[i]->next_slice(); aux_v_slice[i] = aux_v_slice[i]->next_slice();
 					}
 				}
-				else if (t_propa & BACKWARD){
+				else if (t_propa & TimePropag::BACKWARD){
 					for (int i = 0 ; i < x.size() ; i++){
 						x_slice[i] = x_slice[i]->prev_slice(); aux_x_slice[i] = aux_x_slice[i]->prev_slice();
 						v_slice[i] = v_slice[i]->prev_slice(); aux_v_slice[i] = aux_v_slice[i]->prev_slice();
@@ -366,11 +366,11 @@ namespace tubex
 		return bisection;
 	}
 
-	bool CtcIntegration::contract_idiff(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice,TubeVector x,int id, std::vector<Interval>& idiff_values,TPropagation t_propa){
+	bool CtcIntegration::contract_idiff(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice,TubeVector x,int id, std::vector<Interval>& idiff_values,TimePropag t_propa){
 
-		Interval to_try(x_slice[0]->domain());
+		Interval to_try(x_slice[0]->tdomain());
 		for (int i = 1 ; i < x_slice.size(); i++)
-			assert(to_try == x_slice[i]->domain());
+			assert(to_try == x_slice[i]->tdomain());
 
 		bool fix_point_n;
 		bool first_iteration = true;
@@ -387,12 +387,12 @@ namespace tubex
 				/*without polygons*/
 
 				ctc_deriv.contract(*x_slice[i], *v_slice[i],t_propa);
-				if (t_propa & FORWARD){
+				if (t_propa & TimePropag::FORWARD){
 					do{
 						sx=x[i].volume();
 						Interval aux_codomain;
 						/*todo: how to make this general?*/
-						Interval integral_value = -5. * x.integral(x_slice[0]->domain().lb(),x_slice[0]->domain().ub())[i];
+						Interval integral_value = -5. * x.integral(x_slice[0]->tdomain().lb(),x_slice[0]->tdomain().ub())[i];
 						IntervalVector envelope(x_slice.size());
 						for (int j = 0 ; j < x_slice.size() ; j++)
 							envelope[j] = x_slice[j]->codomain();

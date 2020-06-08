@@ -8,7 +8,7 @@
 #ifndef __TUBEX_CTCDYNCIDGUESS_H__
 #define __TUBEX_CTCDYNCIDGUESS_H__
 
-#include "tubex_Ctc.h"
+#include "tubex_DynCtc.h"
 #include "tubex_Slice.h"
 #include "ibex_Function.h"
 #include "tubex_CtcDeriv.h"
@@ -19,7 +19,7 @@
 
 namespace tubex
 {
-	class CtcDynCidGuess : public Ctc{
+	class CtcDynCidGuess : public DynCtc{
 
 	enum {lb,ub};
 
@@ -27,11 +27,11 @@ namespace tubex
 		/*
 		 * todo: add comments
 		 */
-		CtcDynCidGuess(tubex::Fnc& fnc, double prec=0.05);
+		CtcDynCidGuess(TFnc& fnc, double prec=0.05);
 		/*
 		 * todo: add comments
 		 */
-		bool contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TPropagation t_propa);
+		bool contract(std::vector<Slice*> x_slice, std::vector<Slice*> v_slice, TimePropag t_propa);
 		/*
 		 * todo: add comments
 		 */
@@ -43,7 +43,7 @@ namespace tubex
 		/*
 		 * todo: add comments
 		 */
-		void create_slices(Slice & x_slice, std::vector<ibex::Interval> & slices, TPropagation t_propa);
+		void create_slices(Slice & x_slice, std::vector<ibex::Interval> & slices, TimePropag t_propa);
 		/*
 		 * todo: add comments
 		 */
@@ -65,17 +65,17 @@ namespace tubex
 		/*
 		 * todo: add comments
 		 */
-		void var3Bcheck(ibex::Interval remove_ub,int bound, int pos ,std::vector<Slice*> & x_slice,std::vector<Slice*> v_slice,TPropagation t_propa);
+		void var3Bcheck(ibex::Interval remove_ub,int bound, int pos ,std::vector<Slice*> & x_slice,std::vector<Slice*> v_slice,TimePropag t_propa);
 		/*
 		 * todo: add comments
 		*/
-		void FullPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TPropagation t_propa);
+		void FullPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TimePropag t_propa);
 		/*
 		 * todo: add comments
 		*/
-		void AtomicPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TPropagation t_propa);
+		void AtomicPropagationEngine(std::vector<Slice> & x_slice, std::vector<Slice> & v_slice, TimePropag t_propa);
 
-		void create_corners(std::vector<Slice> x_slices, std::vector< std::vector<double> > & points, TPropagation t_propa);
+		void create_corners(std::vector<Slice> x_slices, std::vector< std::vector<double> > & points, TimePropag t_propa);
 		std::vector<std::vector<double>> cart_product (const std::vector<std::vector<double>>& v);
 
 		void set_s_corn(int s_strategy);
@@ -88,7 +88,7 @@ namespace tubex
 
 	private:
 		double prec;
-		tubex::Fnc& fnc;
+		TFnc& fnc;
 		CtcDeriv ctc_deriv;
 		int engine = 0;  //by default the propagation engine is atomic (faster)
 		int s_strategy = 0 ;

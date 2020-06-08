@@ -45,4 +45,6 @@ namespace tubex
   {
     return m_intertemporal;
   }
+  void DynCtc::contract(std::vector<Domain*>& v_domains) {;}
+
 }
