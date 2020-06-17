@@ -42,14 +42,17 @@ set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
 
 # IBEX-lib package
 
-  link_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/lib)
-  link_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/lib/ibex/3rd/)
+  link_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/lib)
+  link_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/lib/ibex/3rd/)
   link_directories(/certis/3/neveub/RECHERCHE/soplex/soplex-3.1.1/lib)
-  include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/include/)
-  include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/include/ibex/)
-  include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/include/ibex/3rd/)
+  include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/)
+ # include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/include/ibex/)
+  #include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/include/ibex/3rd/)
+ include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/ibex/)
+  include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/ibex/3rd/)
   include_directories(/certis/3/neveub/RECHERCHE/soplex/soplex-3.1.1/src)
-  set(LIBS ${LIBS} -libex -lsoplex -lm -lgaol -lgdtoa -lultim) # using library Gaol
+  #set(LIBS ${LIBS} -libex -lsoplex -lm -lgaol -lgdtoa -lultim) # using library Gaol
+ set(LIBS ${LIBS} -libex -lsoplex -lm -lprim) # using library Filib
   set(IBEX_LIBRARY ${LIBS})
 
   list(APPEND CMAKE_MODULE_PATH "${TUBELIB_CMAKE_DIR}/modules") # location of find_package modules
