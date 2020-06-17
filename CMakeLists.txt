@@ -6,9 +6,17 @@
 
   cmake_minimum_required(VERSION 2.8)
 
+
   set(CMAKE_CXX_STANDARD  11)
   set(PACKAGE_NAME        tubex-lib)
   set(PACKAGE_VERSION     "2.0")
+
+  # To use a specific compiler:
+  #set(CMAKE_C_COMPILER "gcc-7")
+  #set(CMAKE_CXX_COMPILER "/usr/bin/g++-7")
+
+#  project(tubex-lib VERSION ${VERSION} LANGUAGES CXX)
+
 
 set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
 
@@ -83,6 +91,7 @@ set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
     add_subdirectory(tests)
     include(CTest)
 
+
     # Basics
     add_test(NAME basics_01
              COMMAND ${TUBELIB_EXAMPLE_DIR}/basics/ex_01_arithmetic/make/basics_01_arithmetic 0)
@@ -96,8 +105,12 @@ set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
              COMMAND ${TUBELIB_EXAMPLE_DIR}/basics/ex_05_simple_eval/make/basics_05_simple_eval 0)
     add_test(NAME basics_06
              COMMAND ${TUBELIB_EXAMPLE_DIR}/basics/ex_06_graphics/make/basics_06_graphics 0)
-    
-    
+  endif()
+
+  # Python binding:
+  if(WITH_PYTHON)
+    add_subdirectory(python)
+
   endif()
 
 

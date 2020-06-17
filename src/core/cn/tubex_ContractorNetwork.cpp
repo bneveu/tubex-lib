@@ -260,10 +260,33 @@ namespace tubex
         }
       }
 
+      // Optimization: do not try to add a CtcDeriv contractor on tubes if it has already
+      // been added (todo: generalize this optimization to any contractor?)
+      if(&dyn_ctc == m_ctc_deriv // if we are dealing with the interval CtcDeriv
+        && !Domain::all_slices(v_domains)) // and if the domains are not slices
+      {
+        assert(v_domains.size() == 2);
+        pair<Domain*,Domain*> p = make_pair(add_dom(v_domains[0]), add_dom(v_domains[1]));
+
+        if(find(m_domains_related_to_ctcderiv.begin(), m_domains_related_to_ctcderiv.end(), p)
+          != m_domains_related_to_ctcderiv.end())
+        {
+          return; // contractor already added
+        }
+
+        else
+        {
+          // Notifying that the contractor will be added
+          m_domains_related_to_ctcderiv.push_back(p);
+
+          // Then, add the contractor in the following..
+        }
+      }
+
       // If possible, breaking down the constraint to slices level
       if(!dyn_ctc.is_intertemporal() && !Domain::all_slices(v_domains))
       {
-        // Not intertemporal => 
+        // Not inter-temporal => 
         assert(Domain::all_dyn(v_domains)); // all domains are slices or tubes or tube vectors
         assert(Domain::dyn_same_slicing(v_domains)); // all domains share same slicing
 

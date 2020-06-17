@@ -2,7 +2,7 @@
 
 .. warning::
   
-  This part of the documentation is deprecated. Several changes are currently perfomed on the library.
+  This part of the documentation is deprecated. Several changes are currently performed on the library.
   A new stable version of Tubex will be released in the coming weeks.
 
 *****************
@@ -16,19 +16,6 @@ Building a solver
 Simple example:
 
 .. tabs::
-
-  .. code-tab:: c++
-
-    CtcFunction ctc_plus(Function("a", "b", "c", "a+b-c"));
-    Interval a(0,1), b(-1,1), c(1.5,2);
-
-    ContractorNetwork cn;
-    cn.add(ctc_plus, {a, b, c}); 
-    cn.contract();
-
-    // a == [0.5,1]
-    // b == [0.5,1]
-    // c == [1.5,2]
 
   .. code-tab:: py
 
@@ -44,3 +31,16 @@ Simple example:
     # a == [0.5,1]
     # b == [0.5,1]
     # c == [1.5,2]
+
+  .. code-tab:: c++
+
+    CtcFunction ctc_plus(Function("a", "b", "c", "a+b-c"));
+    Interval a(0,1), b(-1,1), c(1.5,2);
+
+    ContractorNetwork cn;
+    cn.add(ctc_plus, {a, b, c}); 
+    cn.contract();
+
+    // a == [0.5,1]
+    // b == [0.5,1]
+    // c == [1.5,2]

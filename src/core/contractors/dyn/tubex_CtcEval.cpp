@@ -98,11 +98,11 @@ namespace tubex
     else if(merge_after_ctc)
     {
       // The gate will be lost during the final operation for
-      // preserving the slicing. So we need to propagate localy
+      // preserving the slicing. So we need to propagate locally
       // the information on nearby slices, to keep the information,
       // and then merge them.
 
-      // 1. Contration
+      // 1. Contraction
 
         CtcDeriv ctc_deriv;
         ctc_deriv.contract(*y.slice(t)->prev_slice(), *w.slice(t)->prev_slice());
@@ -266,14 +266,14 @@ namespace tubex
           for(size_t i = 0 ; i < v_gates_to_remove.size() ; i++)
           {
             // The gate will be lost during the final operation for
-            // preserving the slicing. So we need to propagate localy
+            // preserving the slicing. So we need to propagate locally
             // the information on nearby slices, to keep the information,
             // and then merge them.
 
             Slice *s_y = y.slice(v_gates_to_remove[i]);
             Slice *s_w = w.slice(v_gates_to_remove[i]);
 
-            // 1. Contration
+            // 1. Contraction
 
               CtcDeriv ctc_deriv;
               ctc_deriv.contract(*s_y, *s_w);
@@ -290,7 +290,7 @@ namespace tubex
           }
       }
 
-      // todo: remove this (or use Polygons with truncature)
+      // todo: remove this (or use Polygons with truncation)
 
         for(Slice *s = y.first_slice() ; s != NULL ; s = s->next_slice())
         {
@@ -342,7 +342,7 @@ namespace tubex
       contract(t, z[i], y[i], w[i]);
   }
 
-  void CtcEval::contract(const Interval& t, const Interval& z, Tube& y, Tube& w)
+  /*void CtcEval::contract(const Interval& t, const Interval& z, Tube& y, Tube& w)
   {
     assert(y.tdomain() == w.tdomain());
     assert(Tube::same_slicing(y, w));
@@ -356,7 +356,7 @@ namespace tubex
 
     Interval _t(t), _z(z);
     contract(_t, _z, y, w);
-  }
+  }*/
 
   void CtcEval::contract(Interval& t, IntervalVector& z, TubeVector& y, TubeVector& w)
   {
@@ -388,7 +388,7 @@ namespace tubex
 
     t &= t_result;
   }
-
+/*
   void CtcEval::contract(const Interval& t, const IntervalVector& z, TubeVector& y, TubeVector& w)
   {
     assert(y.size() == z.size());
@@ -405,7 +405,7 @@ namespace tubex
 
     Interval _t(t); IntervalVector _z(z);
     contract(_t, _z, y, w);
-  }
+  }*/
 
   void CtcEval::contract(Interval& t, Interval& z, const Tube& y)
   {

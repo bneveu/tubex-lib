@@ -50,8 +50,7 @@ namespace tubex
 
       /**
        * \brief Creates a scalar tube \f$[x](\cdot)\f$ made of one slice
-       * \anchor DOCS_TUBE_TUBE_INTERVAL_INTERVAL
-       *
+       * 
        * \param tdomain temporal domain \f$[t_0,t_f]\f$
        * \param codomain Interval value of the slice (all reals \f$[-\infty,\infty]\f$ by default)
        */
@@ -292,7 +291,7 @@ namespace tubex
       /**
        * \brief Returns a pointer to the Slice defined over the wider temporal domain
        *
-       * \note If two Slice objects have the same tdomain's width, then the first one is considered
+       * \note If two Slice objects have the same tdomain width, then the first one is considered
        *
        * \return a pointer to the corresponding Slice
        */
@@ -301,7 +300,7 @@ namespace tubex
       /**
        * \brief Returns a constant pointer to the Slice defined over the wider temporal domain
        *
-       * \note If two Slice objects have the same tdomain's width, then the first one is considered
+       * \note If two Slice objects have the same tdomain width, then the first one is considered
        *
        * \return a const pointer to the corresponding Slice
        */
@@ -352,7 +351,7 @@ namespace tubex
        * \param t the temporal key (double, must belong to the Tube's tdomain)
        * \return an integer
        */
-      int input2index(double t) const;
+      int time_to_index(double t) const;
 
       /**
        * \brief Returns the Slice index related to the Slice pointer
@@ -1163,7 +1162,7 @@ namespace tubex
 
         Slice *m_first_slice = NULL; //!< pointer to the first Slice object of this tube
         mutable TubeTreeSynthesis *m_synthesis_tree = NULL; //!< pointer to the optional synthesis tree
-        mutable bool m_enable_synthesis = Tube::s_enable_syntheses; //!< enablement of the use of a synthesis tree
+        mutable bool m_enable_synthesis = Tube::s_enable_syntheses; //!< enables of the use of a synthesis tree
         ibex::Interval m_tdomain; //!< redundant information for fast evaluations
 
       friend void deserialize_Tube(std::ifstream& bin_file, Tube *&tube);

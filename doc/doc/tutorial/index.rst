@@ -78,11 +78,14 @@ Prerequisite for attending the tutorial are:
 * basic knowledge of **Python or C++** (the exercises are available in both languages);
 * although the tutorial is about state estimation, you do not need skills in Kalman or particle filters.
 
+| Tubex is fully supported on Linux systems (C++ and Python3).
+| We are currently working on making Tubex available for Windows and MacOS (any help is welcome!). Meanwhile, we propose :ref:`a Tubex-online solution <sec-py-project-online>`: this will allow you to use Tubex in Python without having to install the library on your machine.
+
 
 Contact and registration
 ------------------------
 
-| **For registration, please feel in this questionnaire:**
+| **For registration, please fill in this questionnaire:**
 | https://docs.google.com/forms/d/1nuZ6lxMJ8SmoUeDJzVIjiMUdD5PmX7h72v_N9NtvGq4
 
 The tutorial involves three platforms:
@@ -99,17 +102,15 @@ This tutorial is proposed to the participants of `the ICRA conference <https://w
 Diploma
 -------
 
-To get the diploma, you need to send valid exercises to the organizers. A participant who gets a minimum total of 12 points will receive a diploma corresponding to this tutorial.
-This diploma can be used by students to obtain the corresponding ECTS from their PhD courses, or to comply with any other requests from their home university.
-
-.. An example of the diploma you can obtain is:
+| To get the diploma, you need to send valid exercises to the organizers. A participant who gets a minimum total of 12 points will receive a diploma corresponding to this tutorial. This diploma can be used by students to obtain the corresponding credits for their PhD courses (equivalent to 40 hours of lessons), or to comply with any other requests from their home university.
+| `Here is an example of the diploma you can obtain <http://simon-rohou.fr/research/tubex-lib/public/publipost_tubmooc_2020.pdf>`_.
 
 
 Duration and meeting sessions
 -----------------------------
 
 The tutorial will be held **from 8th of June to 5th of July**.
-Interactive meetings sessions are planned each Wednesday afternoon at 2pm:
+Interactive meetings sessions are planned each Wednesday afternoon at 2PM (UTC):
 
 .. hlist::
   :columns: 4
@@ -118,6 +119,8 @@ Interactive meetings sessions are planned each Wednesday afternoon at 2pm:
   * 17th of June
   * 24th of June
   * 1rst of July
+
+**Interactive sessions (Wed. 10, June):** `select your slot with this form <https://docs.google.com/forms/d/e/1FAIpQLSc4n22iSrwlSMpqqiTc86WmJX1spjzcziHVXPRYfsIdyBU4Kg/viewform?usp=sf_link>`_
 
 
 Content of the tutorial
@@ -165,25 +168,29 @@ Then, depending on your preference between C++ or Python, you can run some *Hell
 
 ------------------------------------------------------
 
+.. _sec-tuto-week1:
+
 **Week 1: June 8 -- June 14**
 
 .. image:: img/tuto_01.png
    :align: right
    :width: 200px
 
-* **Lesson A**: Getting started with intervals and contractors
-* **Lesson B**: Static range-only localization
+.. * **Lesson A**: Getting started with intervals and contractors
+.. * **Lesson B**: Static range-only localization
 
-.. * :ref:`sec-tuto-01`
-.. * :ref:`sec-tuto-02`
+* :ref:`sec-tuto-01`
+* :ref:`sec-tuto-02`
 
 | During this first week, we will install the library and perform the **state estimation** of a static robot between some landmarks. For the moment, we will assume that the robot does not move and is only receiving **range-only data** from the landmarks.
 | This will be an introduction to :ref:`intervals <sec-manual-intervals>`, :ref:`constraints <sec-manual-contractors>` and :ref:`networks of contractors <sec-manual-cn>`.
 
-| **Exercise to finish:** (before Monday 15th of June)
+| **Exercise to finish:** (before Monday 6th of July)
 | -- the static range-only localization, to post on `the MOOC platform <https://mooc.ensta-bretagne.fr/course/view.php?id=7>`_.
 
 ------------------------------------------------------
+
+.. _sec-tuto-week2:
 
 **Week 2: June 15 -- June 21**
 
@@ -191,16 +198,18 @@ Then, depending on your preference between C++ or Python, you can run some *Hell
    :align: right
    :width: 200px
 
-* **Lesson C**: static range-bearing localization
-* **Lesson D**: dynamic range-only localization
+* :ref:`sec-tuto-03`
+* :ref:`sec-tuto-04`
 
 We will go a step further: now the landmarks are perceived with both **range and bearing data**. The resolution will involve new constraints, and a **decomposition** will be achieved.
-In the second part, we will make the robot move and see how we can handle **uncertainties on trajectories**. This will be done by solving the range-only problem of Lesson B, now in a dynamical context with **asynchronous measurements**. 
+In the second part, we will tackle the problem of **indistinguishable** landmarks. We still assume that we know their position, but the robot is not able to make the **association** between the map and the observations. The goal of this exercise is to develop **our own contractor** to solve this problem.
 
-| **Exercise to finish:** (before Monday 22th of June)
-| -- the dynamic range and bearing localization, to post on `the MOOC platform <https://mooc.ensta-bretagne.fr/course/view.php?id=7>`_.
+| **Exercise to finish:** (before Monday 6th of July)
+| -- the data association problem, to post on `the MOOC platform <https://mooc.ensta-bretagne.fr/course/view.php?id=7>`_.
 
 ------------------------------------------------------
+
+.. _sec-tuto-week3:
 
 **Week 3: June 22 -- June 28**
 
@@ -208,15 +217,18 @@ In the second part, we will make the robot move and see how we can handle **unce
    :align: right
    :width: 200px
 
-* **Lesson E**: localization with data association
+* **Lesson E**: tubes
+* **Lesson F**: dynamic localization with data association
 
-Now, the landmarks perceived by the robot are **indistinguishable**. We still assume that we know their position, but the robot is not able to make the **association** between the map and the observations. This corresponds to the publication `Set-membership state estimation by solving data association <https://ras.papercept.net/proceedings/ICRA20/1405.pdf>`_, that is currently presented during this ICRA conference (see |logo_youtube_small| `the video presenting the paper <https://www.youtube.com/watch?v=rkzouwuwo4I>`_ and the `Slack channel #tua07_6 <https://icra20.slack.com/app_redirect?channel=tua07_6>`_).
-We will solve this problem with Tubex. The goal of this exercise is to develop **our own contractor**.
+Now, we will make the robot move and see how we can handle **uncertainties on trajectories**. This will be done by solving the range-only problem of Lesson B, now in a dynamical context with **asynchronous measurements**. 
+We will then use the tubes to solve the problem `Set-membership state estimation by solving data association <https://ras.papercept.net/proceedings/ICRA20/1405.pdf>`_, that is currently presented during this ICRA conference (see |logo_youtube_small| `the video presenting the paper <https://www.youtube.com/watch?v=rkzouwuwo4I>`_ and the `Slack channel #tua07_6 <https://icra20.slack.com/app_redirect?channel=tua07_6>`_).
 
-| **Exercise to finish:** (before Monday 29th of June)
+| **Exercise to finish:** (before Monday 6th of July)
 | -- the data association with bearing only observations, to post on `the MOOC platform <https://mooc.ensta-bretagne.fr/course/view.php?id=7>`_.
 
 ------------------------------------------------------
+
+.. _sec-tuto-week4:
 
 **Week 4: June 29 -- July 5**
 
@@ -224,8 +236,8 @@ We will solve this problem with Tubex. The goal of this exercise is to develop *
    :align: right
    :width: 200px
 
-* **Lesson F**: range-only SLAM
-* **Lesson G**: loop detection in robot trajectories
+* **Lesson G**: range-only SLAM
+* **Lesson H**: loop detection in robot trajectories
 
 | We will end this tutorial with a **range-only SLAM** problem and see how Tubex can be used for **online missions**.
 | The last part of this section will focus on new tools to detect and **prove loops** in robot trajectories from the only knowledge of proprioceptive measurements such as velocities.
