@@ -14,7 +14,7 @@ using namespace ibex;
 
 namespace tubex
 {
-  CtcDynCidGuess::CtcDynCidGuess(TFnc& fnc, double prec): fnc(fnc), prec(prec)
+  CtcDynCidGuess::CtcDynCidGuess(const TFnc& fnc, double prec): fnc(fnc), prec(prec)
 	{
 		//assert(prec >= 0);
 		set_prec(0.05);

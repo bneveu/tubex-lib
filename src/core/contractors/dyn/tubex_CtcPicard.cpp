@@ -46,7 +46,7 @@ namespace tubex
     m_picard_subslices=nsubslices;
   }
 
-  void CtcPicard::contract_picard_tubeslice(const tubex::TFnc& f, TubeVector& x, int & k, TimePropag t_propa )
+  void CtcPicard::contract_picard_tubeslice(const TFnc& f, TubeVector& x, int & k, TimePropag t_propa )
   {
     /*
           if(!x(k).is_unbounded())

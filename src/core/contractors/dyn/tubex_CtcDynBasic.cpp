@@ -6,7 +6,7 @@ using namespace ibex;
 
 namespace tubex
 {
-	CtcDynBasic::CtcDynBasic(TFnc& fnc, double prec): fnc(fnc), prec(prec)
+	CtcDynBasic::CtcDynBasic(const TFnc& fnc, double prec): fnc(fnc), prec(prec)
 	{
 		/*check input*/
 		assert(prec >= 0);

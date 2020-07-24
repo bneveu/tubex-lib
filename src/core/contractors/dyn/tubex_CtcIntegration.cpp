@@ -16,7 +16,7 @@ using namespace ibex;
 
 namespace tubex
 {
-	CtcIntegration::CtcIntegration(TFnc& fnc, DynCtc* slice_ctr): fnc(fnc), slice_ctr(slice_ctr),finaltime(-1)
+	CtcIntegration::CtcIntegration(const TFnc& fnc, DynCtc* slice_ctr): fnc(fnc), slice_ctr(slice_ctr),finaltime(-1)
 	{
 
 	}

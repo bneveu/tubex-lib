@@ -15,7 +15,7 @@ using namespace ibex;
 
 namespace tubex
 {
-	CtcDynCid::CtcDynCid(TFnc& fnc,int scid, double prec): fnc(fnc), scid(scid), prec(prec)
+	CtcDynCid::CtcDynCid(const TFnc& fnc,int scid, double prec): fnc(fnc), scid(scid), prec(prec)
 	{
 		/*check inputs*/
 		assert(scid > 0.);

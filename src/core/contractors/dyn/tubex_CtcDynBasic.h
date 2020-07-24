@@ -23,7 +23,7 @@ namespace tubex
 
 	public:
 
-		CtcDynBasic(TFnc& fnc, double prec = 0.);
+		CtcDynBasic(const TFnc& fnc, double prec = 0.);
 		/*
 		 * This method performs a contraction for the TubeVector x.
 		 * Note that the timesteps between the Tubes of x must be identically the same.
@@ -52,7 +52,7 @@ namespace tubex
 
 		bool m_reasoning_slice = true;
 		CtcDeriv ctc_deriv;
-		TFnc& fnc;
+		const TFnc& fnc;
 		double prec;
 	};
 }
