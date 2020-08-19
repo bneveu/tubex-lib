@@ -154,6 +154,9 @@ namespace tubex
       else // Using polygons to compute the envelope
       {
         // todo: remove this: (or use Polygons with truncation)
+        Interval envelope_before= envelope;
+        Interval ingate_before= ingate;
+        Interval outgate_bef= outgate;
         envelope &= Interval(-BOUNDED_INFINITY,BOUNDED_INFINITY);
 
         x.set_envelope(envelope);
@@ -170,19 +173,22 @@ namespace tubex
         envelope &= x.polygon(v).box()[1];
 
         // todo: remove this: (or use Polygons with truncation)
-        if(envelope.ub() == BOUNDED_INFINITY) envelope = Interval(envelope.lb(),POS_INFINITY);
-        if(envelope.lb() == -BOUNDED_INFINITY) envelope = Interval(NEG_INFINITY,envelope.ub());
-        if(ingate.ub() == BOUNDED_INFINITY) ingate = Interval(ingate.lb(),POS_INFINITY);
-        if(ingate.lb() == -BOUNDED_INFINITY) ingate = Interval(NEG_INFINITY,ingate.ub());
-        if(outgate.ub() == BOUNDED_INFINITY) outgate = Interval(outgate.lb(),POS_INFINITY);
-        if(outgate.lb() == -BOUNDED_INFINITY) outgate = Interval(NEG_INFINITY,outgate.ub());
+
+	// the previous version with setting infinite intervals could violate the contraction rule (BN)
+	if(envelope.ub() == BOUNDED_INFINITY) envelope = Interval(envelope.lb(),envelope_before.ub());
+        if(envelope.lb() == -BOUNDED_INFINITY) envelope = Interval(envelope_before.lb(),envelope.ub());
+        if(ingate.ub() == BOUNDED_INFINITY) ingate = Interval(ingate.lb(),ingate_before.ub());
+        if(ingate.lb() == -BOUNDED_INFINITY) ingate = Interval(ingate_before.lb,ingate.ub());
+        if(outgate.ub() == BOUNDED_INFINITY) outgate = Interval(outgate.lb(),outgate_before.ub);
+        if(outgate.lb() == -BOUNDED_INFINITY) outgate = Interval(outgate_before.lb(),outgate.ub());
       }
+      
 
       x.set_envelope(envelope);
       x.set_input_gate(ingate);
       x.set_output_gate(outgate);
-    }
 
+    }
 
     assert(volume >= x.volume() + v.volume() && "contraction rule not respected");
   }
