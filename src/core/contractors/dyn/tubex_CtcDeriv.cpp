@@ -156,7 +156,7 @@ namespace tubex
         // todo: remove this: (or use Polygons with truncation)
         Interval envelope_before= envelope;
         Interval ingate_before= ingate;
-        Interval outgate_bef= outgate;
+        Interval outgate_before= outgate;
         envelope &= Interval(-BOUNDED_INFINITY,BOUNDED_INFINITY);
 
         x.set_envelope(envelope);
@@ -178,8 +178,8 @@ namespace tubex
 	if(envelope.ub() == BOUNDED_INFINITY) envelope = Interval(envelope.lb(),envelope_before.ub());
         if(envelope.lb() == -BOUNDED_INFINITY) envelope = Interval(envelope_before.lb(),envelope.ub());
         if(ingate.ub() == BOUNDED_INFINITY) ingate = Interval(ingate.lb(),ingate_before.ub());
-        if(ingate.lb() == -BOUNDED_INFINITY) ingate = Interval(ingate_before.lb,ingate.ub());
-        if(outgate.ub() == BOUNDED_INFINITY) outgate = Interval(outgate.lb(),outgate_before.ub);
+        if(ingate.lb() == -BOUNDED_INFINITY) ingate = Interval(ingate_before.lb(),ingate.ub());
+        if(outgate.ub() == BOUNDED_INFINITY) outgate = Interval(outgate.lb(),outgate_before.ub());
         if(outgate.lb() == -BOUNDED_INFINITY) outgate = Interval(outgate_before.lb(),outgate.ub());
       }
       

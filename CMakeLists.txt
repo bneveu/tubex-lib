@@ -21,7 +21,7 @@
 set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
 
   set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} -O3")
-  #set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} -DNDEBUG") # comment for debug
+  set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} -DNDEBUG") # comment for debug
 
 
   project(${PACKAGE_NAME})
