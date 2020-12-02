@@ -69,7 +69,8 @@ namespace tubex
       while(s_x != NULL)
       {
         assert(s_v != NULL);
-        contract(*s_x, *s_v, t_propa);
+	//        contract(*s_x, *s_v, t_propa);
+        contract(*s_x, *s_v, TimePropag::FORWARD);
 	if ((s_x->output_gate()).is_empty()) return;
         s_x = s_x->next_slice();
         s_v = s_v->next_slice();
@@ -84,7 +85,8 @@ namespace tubex
       while(s_x != NULL)
       {
         assert(s_v != NULL);
-        contract(*s_x, *s_v, t_propa);
+        // contract(*s_x, *s_v, t_propa);
+	contract(*s_x, *s_v, TimePropag::BACKWARD);
 	if ((s_x->input_gate()).is_empty()) return;
         s_x = s_x->prev_slice();
         s_v = s_v->prev_slice();
