@@ -4,21 +4,20 @@
 
 # Settings
 
-  cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
+ project(tubex-lib)
 
 
   set(CMAKE_CXX_STANDARD  11)
   set(PACKAGE_NAME        tubex-lib)
   set(PACKAGE_VERSION     "2.0")
 
-  # To use a specific compiler:
-  #set(CMAKE_C_COMPILER "gcc-7")
-  #set(CMAKE_CXX_COMPILER "/usr/bin/g++-7")
+ 
 
-#  project(tubex-lib VERSION ${VERSION} LANGUAGES CXX)
+  #  project(tubex-lib VERSION ${VERSION} LANGUAGES CXX)
 
 
-set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
+  set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
 
   set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} -O3")
   set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} -DNDEBUG") # comment for debug
@@ -29,7 +28,7 @@ set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
   get_filename_component(TUBEX_ROOT          "./"         ABSOLUTE) # used for find_packages modules
   get_filename_component(TUBELIB_CMAKE_DIR   "./cmake"    ABSOLUTE)
   get_filename_component(TUBELIB_EXAMPLE_DIR "./examples" ABSOLUTE)
-  get_filename_component(TUBELIB_BUILD_DIR   "./make"     ABSOLUTE)
+  get_filename_component(TUBELIB_BUILD_DIR   "./build"     ABSOLUTE)
   get_filename_component(TUBELIB_DATA_DIR    "./data"     ABSOLUTE)
 
 ################################################################################
@@ -44,28 +43,31 @@ set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
 # Dependencies
 
 
-#  list(APPEND CMAKE_MODULE_PATH "${TUBELIB_CMAKE_DIR}/modules") # location of find_package modules
+#list(APPEND CMAKE_MODULE_PATH "${TUBELIB_CMAKE_DIR}/modules") # location of find_package modules
  # find_package(IbexLib REQUIRED) # will set variables IBEX_INCLUDE_DIR, IBEX_LIBRARY
   #include_directories("${IBEX_INCLUDE_DIR}")
 
 # IBEX-lib package
 
-  link_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/lib)
-  link_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/lib/ibex/3rd/)
-  link_directories(/certis/3/neveub/RECHERCHE/soplex/soplex-3.1.1/lib)
-  include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/)
- # include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/include/ibex/)
-  #include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex-2.8/ibex-lib/include/ibex/3rd/)
- include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/ibex/)
-  include_directories(/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/ibex/3rd/)
-  include_directories(/certis/3/neveub/RECHERCHE/soplex/soplex-3.1.1/src)
-  #set(LIBS ${LIBS} -libex -lsoplex -lm -lgaol -lgdtoa -lultim) # using library Gaol
- set(LIBS ${LIBS} -libex -lsoplex -lm -lprim) # using library Filib
+  link_directories(/home/neveub/tubex/ibex-lib/install/lib/)
+  link_directories(/home/neveub/tubex/ibex-lib/install/lib/ibex/3rd/)
+
+
+  include_directories(/home/neveub/tubex/ibex-lib/install/include/ibex/)
+  include_directories(/home/neveub/tubex/ibex-lib/install/include/ibex/3rd/)
+
+  #  set(LIBS ${LIBS} -libex -lm -lgaol -lgdtoa -lultim) # using library Gaol
+
+  set(LIBS ${LIBS} -libex -lm -lprim) # using library Filib
   set(IBEX_LIBRARY ${LIBS})
 
   list(APPEND CMAKE_MODULE_PATH "${TUBELIB_CMAKE_DIR}/modules") # location of find_package modules
-  find_package(IbexLib REQUIRED) # will set variables IBEX_INCLUDE_DIR, IBEX_LIBRARY
-  include_directories(SYSTEM "${IBEX_INCLUDE_DIR}")
+
+
+
+
+
+
 
 
 # Optional binary tree activation for all tubes (for tests purposes mainly)
@@ -80,7 +82,7 @@ set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
 
 # Tubex sources
 
-  add_subdirectory(src) # sources of core, robotics, solver
+  add_subdirectory(src) # sources of core, robotics
   include_directories(${TUBELIB_BUILD_DIR}/include/)
 
 
@@ -93,6 +95,8 @@ set_property(GLOBAL PROPERTY COMPILE_FLAGS "-std=c++11 -msse3")
     # Unit tests
     add_subdirectory(tests)
     include(CTest)
+
+    
 
 
     # Basics

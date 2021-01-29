@@ -131,7 +131,7 @@
 # Create the target for libtubex
 ################################################################################
 
-  add_library(tubex ${SRC})
+ add_library(tubex ${SRC})
   target_include_directories(tubex PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/functions
                                           ${CMAKE_CURRENT_SOURCE_DIR}/arithmetic
                                           ${CMAKE_CURRENT_SOURCE_DIR}/graphics
@@ -149,7 +149,7 @@
                                           ${CMAKE_CURRENT_SOURCE_DIR}/contractors/dyn
                                           ${CMAKE_CURRENT_SOURCE_DIR}/cn
                                           ${CMAKE_CURRENT_SOURCE_DIR}/tools)
-  target_link_libraries(tubex PUBLIC Ibex::ibex)
+#  target_link_libraries(tubex PUBLIC Ibex::ibex)
 
 
 ################################################################################
